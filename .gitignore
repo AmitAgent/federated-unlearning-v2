@@ -10,3 +10,5 @@ experiments/*
 # into ./data on first use -- MNIST/CIFAR are large and re-downloadable,
 # never commit them).
 data/
+cnn-to-transformer.patch
+comparisons/
