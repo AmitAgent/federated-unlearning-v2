@@ -35,12 +35,12 @@ def _synthetic_dataset(num_samples=40, channels=1, size=8, num_classes=3, seed=0
 
 
 def test_run_gradient_ascent_raises_on_empty_target_indices():
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
     with pytest.raises(ValueError):
         run_gradient_ascent(
             global_state=model.state_dict(),
-            model_id="cnn",
+            model_id="transformer",
             channels=1,
             num_classes=3,
             dataset=dataset,
@@ -50,12 +50,12 @@ def test_run_gradient_ascent_raises_on_empty_target_indices():
 
 
 def test_run_gradient_ascent_rejects_zero_steps():
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
     with pytest.raises(ValueError):
         run_gradient_ascent(
             global_state=model.state_dict(),
-            model_id="cnn",
+            model_id="transformer",
             channels=1,
             num_classes=3,
             dataset=dataset,
@@ -69,13 +69,13 @@ def test_run_gradient_ascent_raises_target_client_loss():
     must measurably rise over the ascent steps.
     """
     torch.manual_seed(0)
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset(num_samples=40, channels=1, size=8, num_classes=3)
     target_indices = list(range(len(dataset)))
 
     result = run_gradient_ascent(
         global_state=model.state_dict(),
-        model_id="cnn",
+        model_id="transformer",
         channels=1,
         num_classes=3,
         dataset=dataset,
@@ -96,11 +96,11 @@ def test_run_gradient_ascent_raises_target_client_loss():
 
 def test_run_gradient_ascent_never_exceeds_requested_steps():
     torch.manual_seed(1)
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
     result = run_gradient_ascent(
         global_state=model.state_dict(),
-        model_id="cnn",
+        model_id="transformer",
         channels=1,
         num_classes=3,
         dataset=dataset,
@@ -113,13 +113,13 @@ def test_run_gradient_ascent_never_exceeds_requested_steps():
 
 
 def test_run_knowledge_distillation_raises_on_empty_retained_clients():
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
     with pytest.raises(ValueError):
         run_knowledge_distillation(
             teacher_state=model.state_dict(),
             student_state=model.state_dict(),
-            model_id="cnn",
+            model_id="transformer",
             channels=1,
             num_classes=3,
             dataset=dataset,
@@ -129,13 +129,13 @@ def test_run_knowledge_distillation_raises_on_empty_retained_clients():
 
 
 def test_run_knowledge_distillation_rejects_zero_epochs():
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
     with pytest.raises(ValueError):
         run_knowledge_distillation(
             teacher_state=model.state_dict(),
             student_state=model.state_dict(),
-            model_id="cnn",
+            model_id="transformer",
             channels=1,
             num_classes=3,
             dataset=dataset,
@@ -155,20 +155,20 @@ def test_run_knowledge_distillation_recovers_retained_accuracy():
     """
     torch.manual_seed(0)
     dataset = _synthetic_dataset(num_samples=80, channels=1, size=8, num_classes=3, seed=0)
-    base_model = build_model("cnn", channels=1, num_classes=3)
+    base_model = build_model("transformer", channels=1, num_classes=3)
 
     # Full-batch, enough epochs to actually memorize this tiny dataset --
     # otherwise there's nothing for the teacher to know that the
     # damaged student doesn't, and "recovery" wouldn't mean anything.
     teacher_result = local_train(
         global_state=base_model.state_dict(),
-        model_id="cnn",
+        model_id="transformer",
         channels=1,
         num_classes=3,
         dataset=dataset,
         indices=list(range(len(dataset))),
-        epochs=60,
-        lr=0.02,
+        epochs=300,
+        lr=0.05,
         batch_size=80,
     )
     teacher_state = teacher_result["state_dict"]
@@ -182,7 +182,7 @@ def test_run_knowledge_distillation_recovers_retained_accuracy():
     # natural stopping point, so a few too many steps overshoots fast).
     ga_result = run_gradient_ascent(
         global_state=teacher_state,
-        model_id="cnn",
+        model_id="transformer",
         channels=1,
         num_classes=3,
         dataset=dataset,
@@ -198,7 +198,7 @@ def test_run_knowledge_distillation_recovers_retained_accuracy():
     result = run_knowledge_distillation(
         teacher_state=teacher_state,
         student_state=damaged_state,
-        model_id="cnn",
+        model_id="transformer",
         channels=1,
         num_classes=3,
         dataset=dataset,
@@ -217,7 +217,7 @@ def test_run_knowledge_distillation_recovers_retained_accuracy():
 def test_run_knowledge_distillation_tracks_per_client_accuracy():
     torch.manual_seed(2)
     dataset = _synthetic_dataset(num_samples=60, channels=1, size=8, num_classes=3, seed=2)
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
 
     retained_clients = [
         {"client_id": 0, "indices": list(range(0, 20))},
@@ -228,7 +228,7 @@ def test_run_knowledge_distillation_tracks_per_client_accuracy():
     result = run_knowledge_distillation(
         teacher_state=model.state_dict(),
         student_state=model.state_dict(),
-        model_id="cnn",
+        model_id="transformer",
         channels=1,
         num_classes=3,
         dataset=dataset,
@@ -247,10 +247,10 @@ def test_final_checkpoint_save_and_load_round_trip(tmp_path, monkeypatch):
     import core.unlearning.storage as storage
 
     monkeypatch.setattr(storage, "EXPERIMENTS_DIR", tmp_path)
-    model = build_model("cnn", channels=1, num_classes=3)
-    save_final_checkpoint("test-exp", model.state_dict(), model_id="cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
+    save_final_checkpoint("test-exp", model.state_dict(), model_id="transformer", channels=1, num_classes=3)
     loaded = load_final_checkpoint("test-exp")
-    assert loaded["model_id"] == "cnn"
+    assert loaded["model_id"] == "transformer"
     assert loaded["channels"] == 1
     assert loaded["num_classes"] == 3
     assert loaded["state_dict"].keys() == model.state_dict().keys()
@@ -279,10 +279,10 @@ def test_ga_checkpoint_save_and_load_round_trip(tmp_path, monkeypatch):
     import core.unlearning.storage as storage
 
     monkeypatch.setattr(storage, "EXPERIMENTS_DIR", tmp_path)
-    model = build_model("cnn", channels=1, num_classes=3)
-    save_ga_checkpoint("test-exp", model.state_dict(), model_id="cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
+    save_ga_checkpoint("test-exp", model.state_dict(), model_id="transformer", channels=1, num_classes=3)
     loaded = load_ga_checkpoint("test-exp")
-    assert loaded["model_id"] == "cnn"
+    assert loaded["model_id"] == "transformer"
     assert loaded["channels"] == 1
     assert loaded["num_classes"] == 3
     assert loaded["state_dict"].keys() == model.state_dict().keys()
@@ -310,7 +310,7 @@ def test_start_unlearning_end_to_end_on_mnist(tmp_path, monkeypatch):
     run_federated_training(
         experiment_id="mnist-unlearn-smoke",
         partition=partition,
-        model_id="cnn",
+        model_id="transformer",
         rounds=1,
         local_epochs=1,
         seed=42,
@@ -388,7 +388,7 @@ def test_start_unlearning_full_pipeline_synthetic(tmp_path, monkeypatch):
     fl_server.run_federated_training(
         experiment_id="synthetic-unlearn",
         partition=partition,
-        model_id="cnn",
+        model_id="transformer",
         rounds=1,
         local_epochs=1,
         seed=3,
@@ -454,11 +454,11 @@ def test_start_unlearning_rejects_unknown_client(tmp_path, monkeypatch):
     partition_storage.save_partition("bad-client-exp", partition)
     fl_storage.save_fl_history(
         "bad-client-exp",
-        {"experiment_id": "bad-client-exp", "model": "cnn", "dataset": "mnist", "round_history": []},
+        {"experiment_id": "bad-client-exp", "model": "transformer", "dataset": "mnist", "round_history": []},
     )
-    model = build_model("cnn", channels=1, num_classes=10)
+    model = build_model("transformer", channels=1, num_classes=10)
     fl_storage.save_model_checkpoint(
-        "bad-client-exp", model.state_dict(), model_id="cnn", channels=1, num_classes=10
+        "bad-client-exp", model.state_dict(), model_id="transformer", channels=1, num_classes=10
     )
 
     with pytest.raises(ValueError):

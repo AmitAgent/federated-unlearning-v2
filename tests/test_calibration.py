@@ -50,7 +50,7 @@ def _setup():
     dataset = _dataset()
     target = list(range(0, 40))
     reference = list(range(80, 120))
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     _fit(model, dataset, target)  # memorise the target samples
     return dataset, target, reference, model
 
@@ -59,7 +59,7 @@ def test_calibrated_ascent_reports_reason_and_selected_step():
     dataset, target, reference, model = _setup()
     cfg = CalibrationConfig(reference_dataset=dataset, reference_indices=reference, ks_target=0.2)
     result = run_gradient_ascent(
-        global_state=model.state_dict(), model_id="cnn", channels=1, num_classes=3,
+        global_state=model.state_dict(), model_id="transformer", channels=1, num_classes=3,
         dataset=dataset, target_indices=target, steps=30, lr=0.01, calibration=cfg,
     )
     cal = result["calibration"]
@@ -75,7 +75,7 @@ def test_calibrated_ascent_never_returns_worse_ks_than_start():
     dataset, target, reference, model = _setup()
     cfg = CalibrationConfig(reference_dataset=dataset, reference_indices=reference, ks_target=0.0)
     result = run_gradient_ascent(
-        global_state=model.state_dict(), model_id="cnn", channels=1, num_classes=3,
+        global_state=model.state_dict(), model_id="transformer", channels=1, num_classes=3,
         dataset=dataset, target_indices=target, steps=15, lr=0.01, calibration=cfg,
     )
     assert result["calibration"]["selected_ks_distance"] <= result["calibration"]["initial_ks_distance"] + 1e-9
@@ -89,7 +89,7 @@ def test_retain_guard_rolls_back_when_tolerance_is_zero_and_accuracy_drops():
         ks_target=0.0, max_retain_drop=0.0, patience=100,
     )
     result = run_gradient_ascent(
-        global_state=model.state_dict(), model_id="cnn", channels=1, num_classes=3,
+        global_state=model.state_dict(), model_id="transformer", channels=1, num_classes=3,
         dataset=dataset, target_indices=target, steps=30, lr=0.05, calibration=cfg,
     )
     assert result["calibration"]["stop_reason"] in {"retain_guard", "step_budget_exhausted", "already_calibrated"}
@@ -100,7 +100,7 @@ def test_empty_reference_is_rejected():
     cfg = CalibrationConfig(reference_dataset=dataset, reference_indices=[])
     with pytest.raises(ValueError):
         run_gradient_ascent(
-            global_state=model.state_dict(), model_id="cnn", channels=1, num_classes=3,
+            global_state=model.state_dict(), model_id="transformer", channels=1, num_classes=3,
             dataset=dataset, target_indices=target, steps=5, calibration=cfg,
         )
 
@@ -108,7 +108,7 @@ def test_empty_reference_is_rejected():
 def test_without_calibration_result_has_no_calibration_key():
     dataset, target, _, model = _setup()
     result = run_gradient_ascent(
-        global_state=model.state_dict(), model_id="cnn", channels=1, num_classes=3,
+        global_state=model.state_dict(), model_id="transformer", channels=1, num_classes=3,
         dataset=dataset, target_indices=target, steps=3,
     )
     assert "calibration" not in result

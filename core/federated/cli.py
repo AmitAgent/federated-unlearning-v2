@@ -1,6 +1,6 @@
 """CLI entrypoint the Express backend shells out to (Phase 05).
 
-    python -m core.federated.cli --experiment-id demo-1 --model cnn \\
+    python -m core.federated.cli --experiment-id demo-1 --model transformer \\
         --rounds 20 --local-epochs 1 --seed 42
 
 Requires that experiment ``demo-1`` already has a partition saved by
@@ -22,7 +22,7 @@ from core.federated.server import run_federated_training
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run FedAvg training for an experiment.")
     parser.add_argument("--experiment-id", required=True)
-    parser.add_argument("--model", choices=["cnn", "resnet"], default="cnn")
+    parser.add_argument("--model", choices=["transformer"], default="transformer")
     parser.add_argument("--rounds", type=int, required=True)
     parser.add_argument("--local-epochs", type=int, required=True)
     parser.add_argument("--seed", type=int, required=True)

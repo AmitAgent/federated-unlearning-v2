@@ -7,7 +7,7 @@ const DEFAULT_CONFIG = {
   dataset: null, // dataset id, e.g. "cifar10" -- set from the Phase 01 picker
   num_clients: 10, // free numeric input -- never a fixed set of options (Ch.4)
   partition_strategy: "non_iid", // "iid" | "non_iid"
-  model: "cnn", // "cnn" | "resnet"
+  model: "transformer", // "transformer"
   federated_rounds: 20,
   local_epochs: 1,
   seed: 42,

@@ -7,8 +7,7 @@ const PARTITION_STRATEGIES = [
 ];
 
 const MODELS = [
-  { value: "cnn", label: "CNN" },
-  { value: "resnet", label: "ResNet" },
+  { value: "transformer", label: "Vision Transformer" },
 ];
 
 const TRAINING_MODES = [
