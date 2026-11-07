@@ -54,11 +54,13 @@ def get_dataset(dataset_id: str) -> Dataset:
     from core.datasets.mnist import MNISTDataset
     from core.datasets.cifar10 import CIFAR10Dataset
     from core.datasets.cifar100 import CIFAR100Dataset
+    from core.datasets.ag_news import AGNewsDataset
 
     registry = {
         "mnist": MNISTDataset,
         "cifar10": CIFAR10Dataset,
         "cifar100": CIFAR100Dataset,
+        "ag_news": AGNewsDataset,
     }
     if dataset_id not in registry:
         raise KeyError(f"Unknown dataset id '{dataset_id}'")

@@ -1,7 +1,7 @@
 # Phase 05 — Federated Learning Engine
 
 > Status: **Complete**
-> Implementation: `core/federated/model.py` (dataset-agnostic small Vision Transformer), `client.py` (local training step), `fedavg.py` (sample-weighted aggregation), `server.py` (round loop + evaluation + `get_fl_history()`), `storage.py` and `cli.py` (mirroring Phase 03's pattern). Exposed via `POST/GET /api/training` in the Express backend.
+> Implementation: `core/federated/model.py` (two small transformers: a Vision Transformer `transformer` for image datasets and a `text_transformer` for text datasets; `make_optimizer` picks SGD for the former and AdamW for the latter), `client.py` (local training step), `fedavg.py` (sample-weighted aggregation), `server.py` (round loop + evaluation + `get_fl_history()`), `storage.py` and `cli.py` (mirroring Phase 03's pattern). Exposed via `POST/GET /api/training` in the Express backend.
 
 ## Goal
 

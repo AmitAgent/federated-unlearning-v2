@@ -7,7 +7,8 @@ const PARTITION_STRATEGIES = [
 ];
 
 const MODELS = [
-  { value: "transformer", label: "Vision Transformer" },
+  { value: "transformer", label: "Vision Transformer", modality: "image" },
+  { value: "text_transformer", label: "Text Transformer", modality: "text" },
 ];
 
 const TRAINING_MODES = [
@@ -134,7 +135,7 @@ export default function ExperimentConfigForm() {
           onChange={(e) => updateConfig({ model: e.target.value })}
           className={inputClass}
         >
-          {MODELS.map((opt) => (
+          {MODELS.filter((opt) => opt.modality === (config.dataset_modality || "image")).map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>

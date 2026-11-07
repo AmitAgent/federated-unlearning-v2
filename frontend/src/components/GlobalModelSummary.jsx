@@ -1,5 +1,6 @@
 const MODEL_LABEL = {
   transformer: "Vision Transformer",
+  text_transformer: "Text Transformer",
   // Legacy ids from experiments trained before the switch to transformers.
   cnn: "CNN (legacy)",
   resnet: "ResNet (legacy)",

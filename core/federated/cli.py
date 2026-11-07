@@ -22,11 +22,16 @@ from core.federated.server import run_federated_training
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run FedAvg training for an experiment.")
     parser.add_argument("--experiment-id", required=True)
-    parser.add_argument("--model", choices=["transformer"], default="transformer")
+    parser.add_argument("--model", choices=["transformer", "text_transformer"], default="transformer")
     parser.add_argument("--rounds", type=int, required=True)
     parser.add_argument("--local-epochs", type=int, required=True)
     parser.add_argument("--seed", type=int, required=True)
-    parser.add_argument("--lr", type=float, default=0.01)
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=None,
+        help="Local learning rate (default: 0.01 for transformer/SGD, 0.003 for text_transformer/AdamW)",
+    )
     parser.add_argument("--batch-size", type=int, default=32)
     # Phase 14: optional compute backend selection. Omitted (the
     # default) behaves exactly as before this flag existed -- calls
@@ -37,6 +42,10 @@ def main(argv: list[str] | None = None) -> int:
         help="Compute backend: college_gpu | colab | local | demo | auto. Default: run in-process, same as omitting this flag.",
     )
     args = parser.parse_args(argv)
+    if args.lr is None:
+        from core.federated.model import DEFAULT_LR
+
+        args.lr = DEFAULT_LR[args.model]
 
     if args.backend is not None:
         from core.compute.base import BackendUnavailableError, NotSupportedError

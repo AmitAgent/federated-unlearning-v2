@@ -3,6 +3,7 @@
     "id": "mnist",
     "name": "MNIST",
     "description": "Handwritten digits, 0-9.",
+    "modality": "image",
     "image_size": 28,
     "channels": 1,
     "num_classes": 10,
@@ -13,6 +14,7 @@
     "id": "cifar10",
     "name": "CIFAR-10",
     "description": "Natural images across 10 object classes.",
+    "modality": "image",
     "image_size": 32,
     "channels": 3,
     "num_classes": 10,
@@ -23,10 +25,24 @@
     "id": "cifar100",
     "name": "CIFAR-100",
     "description": "Natural images across 100 object classes.",
+    "modality": "image",
     "image_size": 32,
     "channels": 3,
     "num_classes": 100,
     "num_train": 50000,
     "num_test": 10000
+  },
+  "ag_news": {
+    "id": "ag_news",
+    "name": "AG News",
+    "description": "News articles across 4 topics: World, Sports, Business, Sci/Tech.",
+    "modality": "text",
+    "image_size": null,
+    "channels": null,
+    "seq_len": 64,
+    "vocab_size": 30000,
+    "num_classes": 4,
+    "num_train": 120000,
+    "num_test": 7600
   }
 }
