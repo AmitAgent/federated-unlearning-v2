@@ -21,6 +21,7 @@ import argparse
 import json
 import shutil
 import tempfile
+import time
 from pathlib import Path
 
 from core.datasets.base import get_dataset
@@ -31,6 +32,7 @@ from core.evaluation.evaluation_engine import (
 from core.evaluation.storage import load_retraining_results
 from core.federated.storage import load_model_checkpoint
 from core.partitioning.storage import load_partition
+from core.unlearning.baselines import BASELINES
 from core.unlearning.storage import (
     EXPERIMENTS_DIR,
     load_final_checkpoint,
@@ -50,7 +52,17 @@ def _gap(a: float, b: float) -> float:
     return round(abs(a - b), 6)
 
 
-def compare_modes(experiment_id: str, client_id: int | None = None, device: str = "cpu") -> dict:
+def compare_modes(
+    experiment_id: str,
+    client_id: int | None = None,
+    device: str = "cpu",
+    which: str = "all",
+) -> dict:
+    """which: 'all' (our 3 modes + baselines), 'core' (our 3 modes), or
+    'baselines' (only the established baselines, merged into any existing
+    mode_comparison.json)."""
+    if which not in ("all", "core", "baselines"):
+        raise ValueError("which must be 'all', 'core' or 'baselines'")
     exp_dir = EXPERIMENTS_DIR / experiment_id
     try:
         retrain = load_retraining_results(experiment_id)
@@ -78,14 +90,18 @@ def compare_modes(experiment_id: str, client_id: int | None = None, device: str 
     train_data, test_data = ds.get_train(), ds.get_test()
     non_members = list(range(min(DEFAULT_NON_MEMBER_SAMPLE_SIZE, len(test_data))))
 
+    out_path = exp_dir / "mode_comparison.json"
+    rows: dict[str, dict] = {}
+    if which == "baselines" and out_path.exists():
+        rows = json.loads(out_path.read_text()).get("modes", {})
+
     backup = Path(tempfile.mkdtemp(prefix="unlearn-backup-"))
     for name in _BACKED_UP:
         if (exp_dir / name).exists():
             shutil.copy2(exp_dir / name, backup / name)
 
-    rows: dict[str, dict] = {}
     try:
-        for mode, kwargs in MODES.items():
+        for mode, kwargs in (MODES.items() if which != "baselines" else []):
             status = start_unlearning(experiment_id, client_id, device=device, **kwargs)
             final = load_final_checkpoint(experiment_id)
             m = evaluate_model_state(
@@ -120,6 +136,42 @@ def compare_modes(experiment_id: str, client_id: int | None = None, device: str 
                     "mia_success": _gap(row["mia_success"], ref["mia_success"]),
                 }
             rows[mode] = row
+
+        if which != "core":
+            retained_pool = [i for c in retained for i in c["indices"]]
+            for name, fn in BASELINES.items():
+                t0 = time.time()
+                res = fn(
+                    global_state=base_ckpt["state_dict"], model_id=base_ckpt["model_id"],
+                    channels=base_ckpt["channels"], num_classes=base_ckpt["num_classes"],
+                    dataset=train_data, target_indices=target["indices"],
+                    retained_indices=retained_pool, device=device,
+                )
+                m = evaluate_model_state(
+                    res["final_state_dict"], base_ckpt["model_id"], base_ckpt["channels"],
+                    base_ckpt["num_classes"], train_data, test_data, target, retained,
+                    non_members, device=device,
+                )
+                row = {
+                    "global_accuracy": m["global_accuracy"],
+                    "forget_client_accuracy": m["forget_client_accuracy"],
+                    "retained_client_accuracy": m["retained_client_accuracy"],
+                    "mia_success": m["mia_success"],
+                    "ga_steps_completed": res["steps_completed"],
+                    "ga_final_loss": None,
+                    "kd_epochs": 0,
+                    "kd_alpha": None,
+                    "duration_seconds": round(time.time() - t0, 1),
+                    "kind": "established baseline",
+                }
+                if ref is not None:
+                    row["gap_to_retrain"] = {
+                        "forget_accuracy": _gap(row["forget_client_accuracy"], ref["forget_client_accuracy"]),
+                        "retained_accuracy": _gap(row["retained_client_accuracy"], ref["retained_client_accuracy"]),
+                        "global_accuracy": _gap(row["global_accuracy"], ref["global_accuracy"]),
+                        "mia_success": _gap(row["mia_success"], ref["mia_success"]),
+                    }
+                rows[name] = row
     finally:
         for name in _BACKED_UP:
             if (backup / name).exists():
@@ -134,7 +186,7 @@ def compare_modes(experiment_id: str, client_id: int | None = None, device: str 
         "modes": rows,
         "caveat": "single seed, single target client; a data point, not a proof of superiority",
     }
-    (exp_dir / "mode_comparison.json").write_text(json.dumps(result, indent=2))
+    out_path.write_text(json.dumps(result, indent=2))
     return result
 
 
@@ -164,8 +216,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--experiment-id", required=True)
     p.add_argument("--client-id", type=int, default=None)
     p.add_argument("--device", default="cpu")
+    p.add_argument(
+        "--which", default="all", choices=["all", "core", "baselines"],
+        help="all = our 3 modes + established baselines; core = our 3 only; baselines = only GradDiff and retain-only fine-tune (merged into an existing result file)",
+    )
     args = p.parse_args(argv)
-    result = compare_modes(args.experiment_id, args.client_id, args.device)
+    result = compare_modes(args.experiment_id, args.client_id, args.device, args.which)
     print(format_table(result))
     print("\nSaved experiments/%s/mode_comparison.json" % args.experiment_id)
     return 0
