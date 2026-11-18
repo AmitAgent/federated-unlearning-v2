@@ -281,10 +281,13 @@ export default function Unlearning() {
             <>
               <ClientInfluenceBars
                 targetClientId={result.target_client_id}
-                targetBefore={result.gradient_ascent.initial_accuracy}
-                targetAfter={result.gradient_ascent.final_accuracy}
-                retainedBefore={result.knowledge_distillation.per_client_accuracy_before}
-                retainedAfter={result.knowledge_distillation.per_client_accuracy_after}
+                influence={result.client_influence}
+                legacy={{
+                  targetBefore: result.gradient_ascent.initial_accuracy,
+                  targetAfter: result.gradient_ascent.final_accuracy,
+                  retainedBefore: result.knowledge_distillation.per_client_accuracy_before,
+                  retainedAfter: result.knowledge_distillation.per_client_accuracy_after,
+                }}
               />
 
               <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">

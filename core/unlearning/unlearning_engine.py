@@ -52,6 +52,25 @@ def _evenly_spaced(pool: list[int], count: int) -> list[int]:
     return [pool[int(i * stride)] for i in range(count)]
 
 
+def _per_client_accuracy(state: dict, checkpoint: dict, dataset, clients: list[dict], device: str) -> dict:
+    """Accuracy of one model checkpoint on EVERY client's local data.
+
+    Used for the Client Influence chart: the same function is applied to
+    the original, post-ascent and final models so every bar in a column
+    comes from a single, consistent checkpoint. Keys are strings to match
+    the JSON round-trip.
+    """
+    from core.federated.model import build_model
+    from core.unlearning.knowledge_distillation import _client_eval_loaders, _evaluate_accuracy
+
+    model = build_model(
+        checkpoint["model_id"], channels=checkpoint["channels"], num_classes=checkpoint["num_classes"]
+    ).to(device)
+    model.load_state_dict(state)
+    loaders = _client_eval_loaders(dataset, clients, 256)
+    return {str(cid): _evaluate_accuracy(model, loader, device) for cid, loader in loaders.items()}
+
+
 def start_unlearning(
     experiment_id: str,
     client_id: int,
@@ -138,6 +157,8 @@ def start_unlearning(
     # (Phase 09's goal): capture it now, before Gradient Ascent
     # overwrites the working weights below.
     pretrained_state = checkpoint["state_dict"]
+    # Consistent "Before" snapshot: the original global model on all clients.
+    acc_original = _per_client_accuracy(pretrained_state, checkpoint, dataset, clients, device)
 
     status = {
         "experiment_id": experiment_id,
@@ -201,6 +222,10 @@ def start_unlearning(
         }
         save_unlearning_status(experiment_id, status)
         raise
+
+    acc_after_ascent = _per_client_accuracy(
+        ga_result["final_state_dict"], checkpoint, dataset, clients, device
+    )
 
     save_ga_checkpoint(
         experiment_id,
@@ -268,6 +293,10 @@ def start_unlearning(
         num_classes=checkpoint["num_classes"],
     )
 
+    acc_final = _per_client_accuracy(
+        kd_result["final_state_dict"], checkpoint, dataset, clients, device
+    )
+
     knowledge_distillation_summary = {
         "status": "complete",
         "epochs_completed": kd_result["epochs_completed"],
@@ -286,6 +315,13 @@ def start_unlearning(
         **status,
         "status": "complete",
         "knowledge_distillation": knowledge_distillation_summary,
+        # Every client (target included) measured on the same three
+        # checkpoints, so before/after bars are directly comparable.
+        "client_influence": {
+            "original": acc_original,
+            "after_ascent": acc_after_ascent,
+            "final": acc_final,
+        },
         "duration_seconds": time.time() - started_at,
     }
     save_unlearning_status(experiment_id, status)

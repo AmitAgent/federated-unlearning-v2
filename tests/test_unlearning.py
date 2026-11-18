@@ -436,6 +436,14 @@ def test_start_unlearning_full_pipeline_synthetic(tmp_path, monkeypatch):
     assert set(kd["per_client_accuracy_before"].keys()) == {0, 2, 3}
     assert len(kd["epoch_history"]) == 3
 
+    # Client Influence: every client (target included) is measured on the
+    # same checkpoints, so before/after columns are directly comparable.
+    influence = status["client_influence"]
+    all_ids = {"0", "1", "2", "3"}
+    assert set(influence["original"]) == all_ids
+    assert set(influence["after_ascent"]) == all_ids
+    assert set(influence["final"]) == all_ids
+
     assert (tmp_path / "synthetic-unlearn" / "unlearning_ga_model.pt").exists()
     assert (tmp_path / "synthetic-unlearn" / "unlearning_final_model.pt").exists()
 

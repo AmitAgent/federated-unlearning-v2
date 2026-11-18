@@ -28,10 +28,27 @@ function Row({ label, value, highlight }) {
   );
 }
 
-export default function ClientInfluenceBars({ targetClientId, targetBefore, targetAfter, retainedBefore, retainedAfter }) {
-  const retainedClientIds = Object.keys(retainedBefore)
-    .map(Number)
-    .sort((a, b) => a - b);
+function Column({ title, targetClientId, values, ids }) {
+  return (
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{title}</h3>
+      <div className="mt-3 space-y-2.5">
+        {ids.map((id) => (
+          <Row key={id} label={`Client ${id}`} value={values[id] ?? 0} highlight={id === targetClientId} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function ClientInfluenceBars({ targetClientId, influence, legacy }) {
+  // New runs: every client measured on the same checkpoints (original vs
+  // final unlearned model). Older stored runs only have the mixed legacy
+  // fields, so flag them instead of presenting them as a clean comparison.
+  const hasConsistent = Boolean(influence?.original && influence?.final);
+  const before = hasConsistent ? influence.original : { ...legacy.retainedBefore, [targetClientId]: legacy.targetBefore };
+  const after = hasConsistent ? influence.final : { ...legacy.retainedAfter, [targetClientId]: legacy.targetAfter };
+  const ids = Object.keys(before).map(Number).sort((a, b) => a - b);
 
   return (
     <section aria-labelledby="client-influence-heading" className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -39,29 +56,18 @@ export default function ClientInfluenceBars({ targetClientId, targetBefore, targ
         Client Influence — Before vs After
       </h2>
       <p className="mt-1 text-sm text-gray-500">
-        The target client&rsquo;s accuracy should drop; every retained client&rsquo;s accuracy
-        should recover after distillation.
+        Accuracy on each client&rsquo;s own data: original global model vs the final unlearned model.
+        The target client&rsquo;s accuracy should drop; every retained client&rsquo;s should stay high.
       </p>
-
+      {!hasConsistent && (
+        <p className="mt-2 text-xs text-amber-700">
+          Stored before this update: &ldquo;Before&rdquo; mixes pre-ascent (target) and post-ascent
+          (retained) values. Re-run unlearning for a consistent comparison.
+        </p>
+      )}
       <div className="mt-5 grid gap-6 sm:grid-cols-2">
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Before</h3>
-          <div className="mt-3 space-y-2.5">
-            <Row label={`Client ${targetClientId}`} value={targetBefore} highlight />
-            {retainedClientIds.map((id) => (
-              <Row key={id} label={`Client ${id}`} value={retainedBefore[id]} />
-            ))}
-          </div>
-        </div>
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">After</h3>
-          <div className="mt-3 space-y-2.5">
-            <Row label={`Client ${targetClientId}`} value={targetAfter} highlight />
-            {retainedClientIds.map((id) => (
-              <Row key={id} label={`Client ${id}`} value={retainedAfter[id]} />
-            ))}
-          </div>
-        </div>
+        <Column title="Before (original model)" targetClientId={targetClientId} values={before} ids={ids} />
+        <Column title="After (unlearned model)" targetClientId={targetClientId} values={after} ids={ids} />
       </div>
     </section>
   );
