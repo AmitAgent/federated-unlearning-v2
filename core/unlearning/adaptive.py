@@ -17,9 +17,11 @@ NOT derived from theory and carries no forgetting guarantee. Whether it
 beats fixed settings is an empirical question answered by
 `core.unlearning.compare_modes`, not by this file.
 
-Heterogeneity is min-max normalised across the federation's clients, so
-there is no hand-tuned saturation constant: the most distinctive client
-gets h = 1, the least gets h = 0.
+Heterogeneity h is an ABSOLUTE scale: h = min(1, JS / HETEROGENEITY_SATURATION).
+An earlier version min-max normalised across clients, which stretches
+tiny, noise-level differences into the full [0, 1] range when every
+client is nearly IID. The absolute scale gives h ~ 0 for a near-IID
+client. HETEROGENEITY_SATURATION is a design constant, not tuned.
 """
 from __future__ import annotations
 
@@ -35,6 +37,12 @@ KS_TARGET_RANGE = (0.15, 0.05)   # stop ascent when KS distance <= this
 STEPS_CAP_SCALE = 1.0            # ascent step cap = base_steps * (1 + h * this)
 KD_EPOCHS_SCALE = 1.0            # kd epochs = base * (1 + h * this)
 KD_ALPHA_DROP = 0.4              # kd alpha = base * (1 - h * this)
+HETEROGENEITY_SATURATION = 0.2   # JS divergence at which h reaches 1 (untuned)
+
+
+def absolute_heterogeneity(js: float) -> float:
+    """Map a JS divergence to h in [0, 1] on a fixed scale."""
+    return max(0.0, min(1.0, js / HETEROGENEITY_SATURATION))
 
 
 def normalise(scores: dict[int, float], client_id: int) -> float:
@@ -74,11 +82,13 @@ def plan_adaptive_unlearning(
     """Measure heterogeneity for every client and plan the target's settings."""
     client_labels = {c["client_id"]: labels_of(dataset, c["indices"]) for c in clients}
     scores = client_heterogeneity_scores(client_labels, num_classes)
-    h = normalise(scores, target_client_id)
+    h = absolute_heterogeneity(scores[target_client_id])
+    relative = normalise(scores, target_client_id)
     target_dist = label_distribution(client_labels[target_client_id], num_classes)
     return {
         "target_js_divergence": round(scores[target_client_id], 6),
-        "normalised_heterogeneity": round(h, 6),
+        "heterogeneity": round(h, 6),
+        "relative_rank_heterogeneity": round(relative, 6),
         "per_client_js_divergence": {str(k): round(v, 6) for k, v in scores.items()},
         "target_dominant_classes": dominant_classes(target_dist),
         "base": {"steps": steps, "kd_epochs": kd_epochs, "kd_alpha": kd_alpha},

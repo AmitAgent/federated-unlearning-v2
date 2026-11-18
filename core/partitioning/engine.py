@@ -66,8 +66,16 @@ def partition_dataset(
     strategy: str,
     seed: int,
     alpha: float = DEFAULT_DIRICHLET_ALPHA,
+    labels: np.ndarray | None = None,
 ) -> dict:
     """Partition `dataset`'s training samples across `num_clients` clients.
+
+    By default the label skew is defined over a deterministic STAND-IN
+    label array (index % num_classes), not the dataset's real labels, so
+    a 'non_iid' split is non-IID only with respect to those stand-in
+    labels and is close to IID with respect to the real ones. Pass
+    `labels` (the dataset's real training labels, one int per sample) to
+    make the skew real; the result is then marked ``label_source: "real"``.
 
     Mirrors the conceptual ``partition_dataset(dataset, num_clients,
     strategy, seed)`` interface from the Dashboard Spec, Ch.36.
@@ -87,7 +95,18 @@ def partition_dataset(
     num_train = meta["num_train"]
     num_classes = meta["num_classes"]
 
-    labels = _class_labels(num_train, num_classes)
+    if labels is None:
+        labels = _class_labels(num_train, num_classes)
+        label_source = "stand_in"
+    else:
+        labels = np.asarray(labels).astype(int)
+        if labels.shape != (num_train,):
+            raise ValueError(
+                f"labels must have shape ({num_train},), got {tuple(labels.shape)}"
+            )
+        if labels.min() < 0 or labels.max() >= num_classes:
+            raise ValueError(f"labels must lie in [0, {num_classes - 1}]")
+        label_source = "real"
     if strategy == "iid":
         shards = _partition_iid(labels, num_clients, seed)
     else:
@@ -116,6 +135,7 @@ def partition_dataset(
         "alpha": alpha if strategy == "non_iid" else None,
         "num_classes": num_classes,
         "total_samples": num_train,
+        "label_source": label_source,
         "clients": clients,
     }
 

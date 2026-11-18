@@ -73,3 +73,12 @@ def test_settings_clamp_out_of_range_h():
 
 def test_dominant_classes():
     assert dominant_classes([0.1, 0.6, 0.05, 0.25], top=2) == [1, 3]
+
+
+def test_absolute_heterogeneity_is_neutral_for_near_iid_clients():
+    from core.unlearning.adaptive import HETEROGENEITY_SATURATION, absolute_heterogeneity
+
+    assert absolute_heterogeneity(0.0005) < 0.01
+    assert absolute_heterogeneity(HETEROGENEITY_SATURATION) == 1.0
+    assert absolute_heterogeneity(0.9) == 1.0
+    assert absolute_heterogeneity(-1) == 0.0

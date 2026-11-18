@@ -125,7 +125,7 @@ def compare_modes(
             if "adaptive" in hp:
                 row["adaptive"] = {
                     "target_js_divergence": hp["adaptive"]["target_js_divergence"],
-                    "normalised_heterogeneity": hp["adaptive"]["normalised_heterogeneity"],
+                    "heterogeneity": hp["adaptive"]["heterogeneity"],
                     "chosen": hp["adaptive"]["chosen"],
                 }
             if ref is not None:
