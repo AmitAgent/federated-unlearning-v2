@@ -298,7 +298,7 @@ deletion request.
 
 ### Implementation Status
 
-- **Implemented so far:** opt-in calibrated stopping for Gradient Ascent (`--calibrated`). Adaptive strength control and class-aware KD are not implemented.
+- **Implemented so far:** opt-in calibrated stopping for Gradient Ascent (`--calibrated`), and an opt-in heterogeneity-adaptive controller (`--adaptive`, `core/unlearning/adaptive.py`): it measures how distinctive the target client's label distribution is (Jensen-Shannon divergence vs. all other clients, min-max normalised) and sets the calibration threshold, ascent step cap and KD epochs/alpha from that. The mapping is a simple monotone heuristic with no theoretical guarantee. `python -m core.unlearning.compare_modes --experiment-id <id>` measures fixed vs. calibrated vs. adaptive against the retrained reference. Class-aware KD is not implemented. No result showing adaptive beats fixed is claimed until that comparison has been run and recorded.
 -   **Existing project:** Federated-learning and unlearning components
     should be described as implemented only when confirmed in the
     current repository.

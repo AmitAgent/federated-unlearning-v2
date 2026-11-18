@@ -26,7 +26,22 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--experiment-id", required=True)
     parser.add_argument("--alpha", type=float, default=0.5, help="Dirichlet alpha (non_iid only)")
+    parser.add_argument(
+        "--real-labels",
+        action="store_true",
+        help="Skew clients by the dataset's REAL labels (needs torch/torchvision and the dataset). Without it, the split is defined over stand-in labels and is close to IID for the real ones.",
+    )
     args = parser.parse_args(argv)
+
+    labels = None
+    if args.real_labels:
+        try:
+            from core.datasets.base import get_dataset
+
+            labels = [int(y) for y in get_dataset(args.dataset).get_train().targets]
+        except Exception as exc:  # noqa: BLE001 - report any loader failure plainly
+            print(f"Could not load real labels for '{args.dataset}': {exc}", file=sys.stderr)
+            return 1
 
     try:
         partition = partition_dataset(
@@ -35,6 +50,7 @@ def main(argv: list[str] | None = None) -> int:
             strategy=args.strategy,
             seed=args.seed,
             alpha=args.alpha,
+            labels=labels,
         )
     except (ValueError, KeyError) as exc:
         print(str(exc), file=sys.stderr)
