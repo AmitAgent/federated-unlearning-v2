@@ -31,7 +31,11 @@ from core.evaluation.evaluation_engine import (
 from core.evaluation.storage import load_retraining_results
 from core.federated.storage import load_model_checkpoint
 from core.partitioning.storage import load_partition
-from core.unlearning.storage import EXPERIMENTS_DIR, load_final_checkpoint
+from core.unlearning.storage import (
+    EXPERIMENTS_DIR,
+    load_final_checkpoint,
+    load_unlearning_status,
+)
 from core.unlearning.unlearning_engine import start_unlearning
 
 MODES = {
@@ -48,10 +52,21 @@ def _gap(a: float, b: float) -> float:
 
 def compare_modes(experiment_id: str, client_id: int | None = None, device: str = "cpu") -> dict:
     exp_dir = EXPERIMENTS_DIR / experiment_id
-    retrain = load_retraining_results(experiment_id)
+    try:
+        retrain = load_retraining_results(experiment_id)
+    except FileNotFoundError:
+        retrain = None
+        print(
+            "WARNING: no retraining baseline for this experiment, so gap-to-retrain "
+            "cannot be computed. Run `python -m core.evaluation.retraining_cli "
+            f"--experiment-id {experiment_id}` first for the full comparison."
+        )
     if client_id is None:
-        client_id = retrain["target_client_id"]
-    have_reference = retrain["target_client_id"] == client_id
+        if retrain is not None:
+            client_id = retrain["target_client_id"]
+        else:
+            client_id = load_unlearning_status(experiment_id)["target_client_id"]
+    have_reference = retrain is not None and retrain["target_client_id"] == client_id
     ref = retrain["metrics"] if have_reference else None
 
     partition = load_partition(experiment_id)
