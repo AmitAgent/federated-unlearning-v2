@@ -94,4 +94,4 @@ def load_model_checkpoint(experiment_id: str) -> dict:
             f"No model checkpoint found for experiment '{experiment_id}' "
             "(re-run federated training to produce one)"
         )
-    return torch.load(path, weights_only=False)
+    return torch.load(path, weights_only=False, map_location="cpu")

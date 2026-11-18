@@ -108,4 +108,4 @@ def load_retrained_checkpoint(experiment_id: str) -> dict:
             f"No retrained model found for experiment '{experiment_id}' "
             "(run the retraining baseline first)"
         )
-    return torch.load(path, weights_only=False)
+    return torch.load(path, weights_only=False, map_location="cpu")

@@ -108,7 +108,7 @@ def load_ga_checkpoint(experiment_id: str) -> dict:
             f"No Gradient Ascent checkpoint found for experiment '{experiment_id}' "
             "(run start_unlearning first)"
         )
-    return torch.load(path, weights_only=False)
+    return torch.load(path, weights_only=False, map_location="cpu")
 
 
 def save_final_checkpoint(
@@ -155,4 +155,4 @@ def load_final_checkpoint(experiment_id: str) -> dict:
             f"No final unlearned model found for experiment '{experiment_id}' "
             "(run start_unlearning first)"
         )
-    return torch.load(path, weights_only=False)
+    return torch.load(path, weights_only=False, map_location="cpu")
