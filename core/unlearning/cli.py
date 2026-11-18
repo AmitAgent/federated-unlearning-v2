@@ -40,6 +40,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--ks-target", type=float, default=0.1, help="Calibrated mode: stop when KS distance <= this")
     parser.add_argument("--max-retain-drop", type=float, default=0.05, help="Calibrated mode: max allowed retained guard-accuracy drop")
+    parser.add_argument(
+        "--adaptive",
+        action="store_true",
+        help="Heterogeneity-adaptive mode: measure how distinctive the target client's labels are and set the calibration threshold, step cap and KD strength from that (implies --calibrated).",
+    )
     # Phase 14: optional compute backend selection. Omitted (the
     # default) behaves exactly as before this flag existed.
     parser.add_argument(
@@ -69,6 +74,10 @@ def main(argv: list[str] | None = None) -> int:
             ks_target=args.ks_target,
             max_retain_drop=args.max_retain_drop,
         )
+
+    if args.adaptive:
+        # Only passed when requested (same reason as --calibrated above).
+        unlearning_kwargs["adaptive"] = True
 
     if args.backend is not None:
         from core.compute.base import BackendUnavailableError, NotSupportedError
