@@ -33,11 +33,12 @@ function formatDate(ms) {
 
 export default function ExperimentHistory() {
   const navigate = useNavigate();
-  const { loadExperiment } = useExperimentConfig();
+  const { config, loadExperiment, refreshStages } = useExperimentConfig();
 
   const [experiments, setExperiments] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ready | error
   const [error, setError] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     let ignore = false;
@@ -65,6 +66,31 @@ export default function ExperimentHistory() {
       navigate("/client-selection");
     },
     [loadExperiment, navigate]
+  );
+
+  const deleteExperiment = useCallback(
+    async (experiment) => {
+      const id = experiment.experiment_id;
+      const confirmed = window.confirm(
+        `Permanently delete experiment "${id}"?\n\n` +
+          "This removes its partition, trained model and every stored result. " +
+          "It cannot be undone."
+      );
+      if (!confirmed) return;
+      setDeletingId(id);
+      setError(null);
+      try {
+        await apiFetch(`/api/experiments/${encodeURIComponent(id)}`, { method: "DELETE" });
+        setExperiments((prev) => prev.filter((e) => e.experiment_id !== id));
+        if (config.experiment_id === id) refreshStages(id);
+      } catch (err) {
+        setError(err);
+        setStatus("error");
+      } finally {
+        setDeletingId(null);
+      }
+    },
+    [config.experiment_id, refreshStages]
   );
 
   return (
@@ -137,6 +163,15 @@ export default function ExperimentHistory() {
                       className="rounded-md border border-gray-200 px-3 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
                     >
                       Open
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteExperiment(experiment)}
+                      disabled={deletingId === experiment.experiment_id}
+                      aria-label={`Delete experiment ${experiment.experiment_id}`}
+                      className="ml-2 rounded-md border border-gray-200 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-50"
+                    >
+                      {deletingId === experiment.experiment_id ? "Deleting…" : "Delete"}
                     </button>
                   </td>
                 </tr>

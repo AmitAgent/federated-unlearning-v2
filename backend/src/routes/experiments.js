@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { existsSync, readdirSync, readFileSync, statSync } from "fs";
+import { existsSync, lstatSync, readdirSync, readFileSync, rmSync, statSync } from "fs";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { dirname, join, resolve, sep } from "path";
 import { validateExperimentIdParam } from "../artifacts.js";
-import { sendNotFound } from "../errors.js";
+import { sendInvalidRequest, sendNotFound } from "../errors.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // backend/src/routes/ -> repo root
@@ -146,6 +146,40 @@ router.get("/", (req, res) => {
   if (trainedOnly) filtered = filtered.filter((s) => s.stages.trained);
   if (replayableOnly) filtered = filtered.filter((s) => s.replayable);
   res.status(200).json({ experiments: filtered });
+});
+
+// DELETE /api/experiments/:experimentId -> permanently remove one
+// experiment's whole folder (partition, trained model, unlearning /
+// evaluation / retraining results). experiments/ is git-ignored, so
+// this cannot be recovered from version control. The id is already
+// allow-list validated by router.param; the resolved path is also
+// checked to sit strictly inside experiments/, and symlinks are never
+// followed.
+router.delete("/:experimentId", (req, res) => {
+  const { experimentId } = req.params;
+  const root = resolve(EXPERIMENTS_DIR);
+  const target = resolve(EXPERIMENTS_DIR, experimentId);
+  if (!target.startsWith(root + sep)) {
+    return sendInvalidRequest(res, "That experiment id is not valid.");
+  }
+  if (!existsSync(target)) {
+    return sendNotFound(res, `No experiment "${experimentId}" found.`);
+  }
+  const info = lstatSync(target);
+  if (info.isSymbolicLink() || !info.isDirectory()) {
+    return sendInvalidRequest(res, "That experiment cannot be deleted.");
+  }
+  try {
+    rmSync(target, { recursive: true, force: true });
+  } catch (err) {
+    return res.status(500).json({
+      error: `Could not delete experiment "${experimentId}".`,
+      code: "DELETE_FAILED",
+      detail: err instanceof Error ? err.message : String(err),
+      retryable: true,
+    });
+  }
+  res.status(200).json({ deleted: experimentId });
 });
 
 function datasetConfig(datasetId) {
