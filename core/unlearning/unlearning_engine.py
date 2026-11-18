@@ -69,6 +69,7 @@ def start_unlearning(
     max_retain_drop: float = 0.05,
     reference_size: int = 500,
     guard_size: int = 1000,
+    adaptive: bool = False,
 ) -> dict:
     """Run the full Gradient Ascent -> Knowledge Distillation pipeline
     against `client_id`'s local data.
@@ -92,6 +93,30 @@ def start_unlearning(
     retained_clients = [c for c in clients if c["client_id"] != client_id]
 
     dataset = get_dataset(partition["dataset"]).get_train()
+
+    # Opt-in heterogeneity-adaptive controller: measure how distinctive the
+    # target client is, then override the strength settings. It needs the
+    # calibrated stopping rule (it sets that rule's threshold), so it turns
+    # calibration on. Without `adaptive`, nothing here runs.
+    adaptive_plan = None
+    if adaptive:
+        from core.unlearning.adaptive import plan_adaptive_unlearning
+
+        adaptive_plan = plan_adaptive_unlearning(
+            dataset=dataset,
+            clients=clients,
+            target_client_id=client_id,
+            num_classes=partition["num_classes"],
+            steps=steps,
+            kd_epochs=kd_epochs,
+            kd_alpha=kd_alpha,
+        )
+        chosen = adaptive_plan["chosen"]
+        steps = chosen["steps"]
+        kd_epochs = chosen["kd_epochs"]
+        kd_alpha = chosen["kd_alpha"]
+        ks_target = chosen["ks_target"]
+        calibrated = True
 
     calibration = None
     if calibrated:
@@ -147,6 +172,8 @@ def start_unlearning(
             "reference_size": reference_size,
             "guard_size": guard_size,
         }
+    if adaptive_plan is not None:
+        status["hyperparameters"]["adaptive"] = adaptive_plan
     save_unlearning_status(experiment_id, status)
 
     # -- Stage 1: Gradient Ascent (Phase 08) --------------------------
