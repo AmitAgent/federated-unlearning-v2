@@ -11,6 +11,7 @@ import retrainingRouter from "./routes/retraining.js";
 import experimentsRouter from "./routes/experiments.js";
 import computeRouter from "./routes/compute.js";
 import releasesRouter from "./routes/releases.js";
+import modeComparisonRouter from "./routes/modeComparison.js";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use("/api/retraining", retrainingRouter);
 app.use("/api/experiments", experimentsRouter);
 app.use("/api/compute", computeRouter);
 app.use("/api/releases", releasesRouter);
+app.use("/api/mode-comparison", modeComparisonRouter);
 
 // Health-check route (Phase 00 deliverable).
 app.get("/status", async (_req, res) => {

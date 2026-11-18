@@ -35,7 +35,7 @@ check for you.
 |------|-----|------|
 | Number of clients selectable | Look: Setup page (free numeric input) | [ ] |
 | Partition strategy selectable | Look: IID / Non-IID | [ ] |
-| Model selectable | Look: CNN / ResNet | [ ] |
+| Model selectable | Look: Vision Transformer | [ ] |
 | Federated rounds configurable | Look | [ ] |
 | Existing experiments loadable | Look: Overview "Quick Demo" and Experiment History "Open" | [ ] |
 

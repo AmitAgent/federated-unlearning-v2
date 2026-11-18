@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 from core.datasets.base import get_dataset, load_manifest
 from core.federated.client import local_train
 from core.federated.fedavg import federated_average
-from core.federated.model import build_model
+from core.federated.model import build_model, check_model_dataset_compatible
 from core.federated.storage import (
     load_fl_history,
     save_fl_history,
@@ -74,6 +74,7 @@ def fedavg_train(
     meta = manifest[dataset_id]
     channels = meta["channels"]
     num_classes = meta["num_classes"]
+    check_model_dataset_compatible(model_id, meta)
 
     torch.manual_seed(seed)
 

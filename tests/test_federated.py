@@ -39,7 +39,7 @@ def test_federated_average_rejects_empty_input():
         federated_average([], [])
 
 
-@pytest.mark.parametrize("model_id", ["cnn", "resnet"])
+@pytest.mark.parametrize("model_id", ["transformer"])
 def test_build_model_output_shape(model_id):
     model = build_model(model_id, channels=1, num_classes=10)
     x = torch.randn(4, 1, 28, 28)
@@ -89,7 +89,7 @@ def test_run_federated_training_converges_on_mnist(tmp_path, monkeypatch):
     history = run_federated_training(
         experiment_id="mnist-smoke",
         partition=partition,
-        model_id="cnn",
+        model_id="transformer",
         rounds=2,
         local_epochs=1,
         seed=42,

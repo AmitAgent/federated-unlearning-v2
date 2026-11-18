@@ -1,6 +1,9 @@
 const MODEL_LABEL = {
-  cnn: "CNN",
-  resnet: "ResNet",
+  transformer: "Vision Transformer",
+  text_transformer: "Text Transformer",
+  // Legacy ids from experiments trained before the switch to transformers.
+  cnn: "CNN (legacy)",
+  resnet: "ResNet (legacy)",
 };
 
 // Presents the trained global model as a first-class object (Phase 07

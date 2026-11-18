@@ -154,8 +154,11 @@ function datasetConfig(datasetId) {
   if (!entry) return null;
   return {
     name: entry.name,
+    modality: entry.modality ?? "image",
     image_size: entry.image_size,
     channels: entry.channels,
+    seq_len: entry.seq_len ?? null,
+    vocab_size: entry.vocab_size ?? null,
     num_classes: entry.num_classes,
     num_train: entry.num_train,
     num_test: entry.num_test,

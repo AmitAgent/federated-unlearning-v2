@@ -33,7 +33,7 @@ def local_train(
     trains it on `dataset[indices]` for `epochs` epochs, and returns the
     updated state dict plus this client's local stats.
     """
-    from core.federated.model import build_model
+    from core.federated.model import build_model, make_optimizer
 
     model = build_model(model_id, channels=channels, num_classes=num_classes).to(device)
     model.load_state_dict(global_state)
@@ -42,7 +42,7 @@ def local_train(
     subset = Subset(dataset, indices)
     loader = DataLoader(subset, batch_size=batch_size, shuffle=True)
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
+    optimizer = make_optimizer(model_id, model.parameters(), lr)
     criterion = nn.CrossEntropyLoss()
 
     total_loss = 0.0

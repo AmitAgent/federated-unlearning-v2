@@ -52,3 +52,11 @@ Phase 00 (project skeleton)
 ---
 Previous: [Phase 00 — Project Setup & Architecture Foundation](../phase-00-project-setup/README.md)
 Next: [Phase 02 — Experiment Configuration](../phase-02-experiment-configuration/README.md)
+
+## Text datasets (added later)
+
+`manifest.json` entries carry a `modality` (`image` or `text`). **AG News** (`ag_news`, 4 news-topic classes, 120,000 train / 7,600 test) is the first text dataset:
+
+- `core/datasets/ag_news.py` downloads the CSVs once with the standard library (no extra dependency) into `./data/ag_news/` and caches the tokenized tensors there.
+- `core/datasets/text.py` holds the tokenizer shared by every client: a deterministic CRC32 *hashing* tokenizer (30,000 buckets, 64 tokens, `[CLS]` first, 0 = padding). No vocabulary file needs to be built or shared, and ids are identical across processes and machines.
+- Text datasets must be trained with `text_transformer`; image datasets with `transformer`. A mismatched pairing fails fast with a clear message (`check_model_dataset_compatible`), and the dashboard only offers the matching model.

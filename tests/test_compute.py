@@ -97,7 +97,7 @@ def test_local_backend_reads_delegate_to_storage(tmp_path, monkeypatch):
 
     partition_storage.save_partition("e", {"dataset": "mnist", "num_clients": 2, "clients": []})
     fl_storage.save_fl_history(
-        "e", {"dataset": "mnist", "model": "cnn", "num_clients": 2, "rounds": 3, "seed": 1, "final_accuracy": 0.9}
+        "e", {"dataset": "mnist", "model": "transformer", "num_clients": 2, "rounds": 3, "seed": 1, "final_accuracy": 0.9}
     )
     unlearning_storage.save_unlearning_status("e", {"experiment_id": "e", "status": "complete"})
     evaluation_storage.save_evaluation_results("e", {"experiment_id": "e", "status": "complete"})
@@ -139,7 +139,7 @@ def test_demo_backend_shares_local_backends_read_paths(tmp_path, monkeypatch):
 
     monkeypatch.setattr(fl_storage, "EXPERIMENTS_DIR", tmp_path)
     fl_storage.save_fl_history(
-        "e", {"dataset": "cifar10", "model": "resnet", "num_clients": 5, "rounds": 10, "seed": 3, "final_accuracy": 0.7}
+        "e", {"dataset": "cifar10", "model": "transformer", "num_clients": 5, "rounds": 10, "seed": 3, "final_accuracy": 0.7}
     )
     assert DemoBackend().get_fl_history("e")["dataset"] == "cifar10"
 
@@ -397,7 +397,7 @@ def test_federated_cli_backend_flag_dispatches_through_registry(monkeypatch, cap
     monkeypatch.setattr(registry_module, "call_with_fallback", _fake_call_with_fallback(fake))
 
     rc = federated_cli.main(
-        ["--experiment-id", "e", "--model", "cnn", "--rounds", "5", "--local-epochs", "1", "--seed", "1", "--backend", "local"]
+        ["--experiment-id", "e", "--model", "transformer", "--rounds", "5", "--local-epochs", "1", "--seed", "1", "--backend", "local"]
     )
     assert rc == 0
     payload = json.loads(capsys.readouterr().out)
@@ -405,7 +405,7 @@ def test_federated_cli_backend_flag_dispatches_through_registry(monkeypatch, cap
     assert payload["backend_trace"][0]["backend"] == "local"
     name, kwargs = fake.calls[0]
     assert name == "run_federated_training"
-    assert kwargs == {"experiment_id": "e", "model_id": "cnn", "rounds": 5, "local_epochs": 1, "seed": 1, "lr": 0.01, "batch_size": 32}
+    assert kwargs == {"experiment_id": "e", "model_id": "transformer", "rounds": 5, "local_epochs": 1, "seed": 1, "lr": 0.01, "batch_size": 32}
 
 
 def test_federated_cli_without_backend_flag_is_unchanged(monkeypatch):
@@ -544,7 +544,7 @@ def test_call_with_fallback_auto_serves_from_local_when_remotes_unconfigured(tmp
     import core.compute.registry as registry
 
     monkeypatch.setattr(fl_storage, "EXPERIMENTS_DIR", tmp_path)
-    fl_storage.save_fl_history("e", {"dataset": "mnist", "model": "cnn", "num_clients": 2, "rounds": 1, "seed": 1})
+    fl_storage.save_fl_history("e", {"dataset": "mnist", "model": "transformer", "num_clients": 2, "rounds": 1, "seed": 1})
     result, trace = registry.call_with_fallback("auto", "get_fl_history", experiment_id="e")
     assert result["dataset"] == "mnist"
     assert [t["backend"] for t in trace] == ["college_gpu", "colab", "local"]

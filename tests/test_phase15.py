@@ -76,7 +76,7 @@ def make_experiment(base: Path, experiment_id="exp-ok", *, hyperparameters=True)
             {
                 "experiment_id": experiment_id,
                 "dataset": "mnist",
-                "model": "cnn",
+                "model": "transformer",
                 "num_clients": 4,
                 "rounds": 3,
                 "local_epochs": 1,
@@ -94,7 +94,7 @@ def make_experiment(base: Path, experiment_id="exp-ok", *, hyperparameters=True)
     status = {
         "experiment_id": experiment_id,
         "target_client_id": 2,
-        "model": "cnn",
+        "model": "transformer",
         "dataset": "mnist",
         "stage": "knowledge_distillation",
         "status": "complete",

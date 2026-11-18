@@ -35,7 +35,7 @@ def _evaluation(target=2, unlearning_seconds=5.0):
     return {
         "experiment_id": "x",
         "target_client_id": target,
-        "model": "cnn",
+        "model": "transformer",
         "dataset": "mnist",
         "before": _metrics(0.90, 0.92, 0.91, 0.80),
         "after": _metrics(0.85, 0.40, 0.86, 0.55),
@@ -206,7 +206,7 @@ def pipeline(tmp_path, monkeypatch):
     exp = "retrain-synthetic"
     partition_storage.save_partition(exp, partition)
     fl_server.run_federated_training(
-        experiment_id=exp, partition=partition, model_id="cnn", rounds=2, local_epochs=1,
+        experiment_id=exp, partition=partition, model_id="transformer", rounds=2, local_epochs=1,
         seed=7, lr=0.1, batch_size=16,
     )
     unlearning_engine.start_unlearning(

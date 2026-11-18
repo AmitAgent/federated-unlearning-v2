@@ -13,16 +13,31 @@ export default function DatasetCard({ dataset, selected, onSelect }) {
       <h3 className="text-sm font-semibold text-gray-900">{dataset.name}</h3>
       <p className="mt-1 text-sm text-gray-500">{dataset.description}</p>
       <dl className="mt-3 space-y-1 text-xs text-gray-600">
-        <div>
-          <dt className="inline font-medium text-gray-700">Image size: </dt>
-          <dd className="inline">
-            {dataset.image_size}×{dataset.image_size}
-          </dd>
-        </div>
-        <div>
-          <dt className="inline font-medium text-gray-700">Channels: </dt>
-          <dd className="inline">{dataset.channels}</dd>
-        </div>
+        {dataset.modality === "text" ? (
+          <>
+            <div>
+              <dt className="inline font-medium text-gray-700">Type: </dt>
+              <dd className="inline">Text</dd>
+            </div>
+            <div>
+              <dt className="inline font-medium text-gray-700">Sequence length: </dt>
+              <dd className="inline">{dataset.seq_len} tokens</dd>
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <dt className="inline font-medium text-gray-700">Image size: </dt>
+              <dd className="inline">
+                {dataset.image_size}×{dataset.image_size}
+              </dd>
+            </div>
+            <div>
+              <dt className="inline font-medium text-gray-700">Channels: </dt>
+              <dd className="inline">{dataset.channels}</dd>
+            </div>
+          </>
+        )}
         <div>
           <dt className="inline font-medium text-gray-700">Classes: </dt>
           <dd className="inline">{dataset.num_classes}</dd>

@@ -38,22 +38,22 @@ def test_evaluate_global_accuracy_matches_compute_accuracy():
     from torch.utils.data import DataLoader
 
     torch.manual_seed(0)
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
 
     direct = compute_accuracy(model, DataLoader(dataset, batch_size=16, shuffle=False), "cpu")
     via_helper = evaluate_global_accuracy(
-        model.state_dict(), "cnn", channels=1, num_classes=3, test_dataset=dataset, device="cpu"
+        model.state_dict(), "transformer", channels=1, num_classes=3, test_dataset=dataset, device="cpu"
     )
     assert via_helper == pytest.approx(direct)
 
 
 def test_evaluate_client_accuracy_raises_on_empty_indices():
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
     with pytest.raises(ValueError):
         evaluate_client_accuracy(
-            model.state_dict(), "cnn", channels=1, num_classes=3, train_dataset=dataset, indices=[]
+            model.state_dict(), "transformer", channels=1, num_classes=3, train_dataset=dataset, indices=[]
         )
 
 
@@ -64,34 +64,34 @@ def test_evaluate_client_accuracy_recovers_high_accuracy_after_memorizing():
     """
     torch.manual_seed(0)
     dataset = _synthetic_dataset(num_samples=30, channels=1, size=8, num_classes=3, seed=0)
-    base_model = build_model("cnn", channels=1, num_classes=3)
+    base_model = build_model("transformer", channels=1, num_classes=3)
     indices = list(range(len(dataset)))
 
     trained = local_train(
         global_state=base_model.state_dict(),
-        model_id="cnn",
+        model_id="transformer",
         channels=1,
         num_classes=3,
         dataset=dataset,
         indices=indices,
-        epochs=40,
+        epochs=200,
         lr=0.05,
         batch_size=30,
     )
 
     accuracy = evaluate_client_accuracy(
-        trained["state_dict"], "cnn", channels=1, num_classes=3, train_dataset=dataset, indices=indices
+        trained["state_dict"], "transformer", channels=1, num_classes=3, train_dataset=dataset, indices=indices
     )
     assert accuracy > 0.8
 
 
 def test_evaluate_retained_accuracy_raises_on_empty_clients():
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
     with pytest.raises(ValueError):
         evaluate_retained_accuracy(
             model.state_dict(),
-            "cnn",
+            "transformer",
             channels=1,
             num_classes=3,
             train_dataset=dataset,
@@ -102,7 +102,7 @@ def test_evaluate_retained_accuracy_raises_on_empty_clients():
 def test_evaluate_retained_accuracy_tracks_per_client_and_mean():
     torch.manual_seed(1)
     dataset = _synthetic_dataset(num_samples=60, channels=1, size=8, num_classes=3, seed=1)
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
 
     retained_clients = [
         {"client_id": 0, "indices": list(range(0, 20))},
@@ -112,7 +112,7 @@ def test_evaluate_retained_accuracy_tracks_per_client_and_mean():
 
     result = evaluate_retained_accuracy(
         model.state_dict(),
-        "cnn",
+        "transformer",
         channels=1,
         num_classes=3,
         train_dataset=dataset,
@@ -129,12 +129,12 @@ def test_evaluate_retained_accuracy_tracks_per_client_and_mean():
 
 
 def test_run_membership_inference_raises_on_empty_member_indices():
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
     with pytest.raises(ValueError):
         run_membership_inference(
             model.state_dict(),
-            "cnn",
+            "transformer",
             channels=1,
             num_classes=3,
             train_dataset=dataset,
@@ -145,12 +145,12 @@ def test_run_membership_inference_raises_on_empty_member_indices():
 
 
 def test_run_membership_inference_raises_on_empty_non_member_indices():
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     dataset = _synthetic_dataset()
     with pytest.raises(ValueError):
         run_membership_inference(
             model.state_dict(),
-            "cnn",
+            "transformer",
             channels=1,
             num_classes=3,
             train_dataset=dataset,
@@ -166,13 +166,13 @@ def test_run_membership_inference_near_chance_on_untrained_model():
     should sit close to the 0.5 chance baseline.
     """
     torch.manual_seed(0)
-    model = build_model("cnn", channels=1, num_classes=3)
+    model = build_model("transformer", channels=1, num_classes=3)
     train_dataset = _synthetic_dataset(num_samples=60, channels=1, size=8, num_classes=3, seed=0)
     test_dataset = _synthetic_dataset(num_samples=60, channels=1, size=8, num_classes=3, seed=1)
 
     result = run_membership_inference(
         model.state_dict(),
-        "cnn",
+        "transformer",
         channels=1,
         num_classes=3,
         train_dataset=train_dataset,
@@ -197,24 +197,24 @@ def test_run_membership_inference_detects_memorized_training_set():
     torch.manual_seed(2)
     train_dataset = _synthetic_dataset(num_samples=20, channels=1, size=8, num_classes=3, seed=2)
     held_out_dataset = _synthetic_dataset(num_samples=20, channels=1, size=8, num_classes=3, seed=3)
-    base_model = build_model("cnn", channels=1, num_classes=3)
+    base_model = build_model("transformer", channels=1, num_classes=3)
     member_indices = list(range(len(train_dataset)))
 
     trained = local_train(
         global_state=base_model.state_dict(),
-        model_id="cnn",
+        model_id="transformer",
         channels=1,
         num_classes=3,
         dataset=train_dataset,
         indices=member_indices,
-        epochs=60,
+        epochs=200,
         lr=0.05,
         batch_size=20,
     )
 
     result = run_membership_inference(
         trained["state_dict"],
-        "cnn",
+        "transformer",
         channels=1,
         num_classes=3,
         train_dataset=train_dataset,
@@ -301,7 +301,7 @@ def test_evaluate_experiment_full_pipeline_synthetic(tmp_path, monkeypatch):
     fl_server.run_federated_training(
         experiment_id="eval-synthetic",
         partition=partition,
-        model_id="cnn",
+        model_id="transformer",
         rounds=1,
         local_epochs=1,
         seed=4,

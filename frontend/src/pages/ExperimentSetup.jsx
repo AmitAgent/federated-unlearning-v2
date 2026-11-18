@@ -29,7 +29,14 @@ export default function ExperimentSetup() {
               key={dataset.id}
               dataset={dataset}
               selected={config.dataset === dataset.id}
-              onSelect={(id) => updateConfig({ dataset: id })}
+              onSelect={() =>
+                updateConfig({
+                  dataset: dataset.id,
+                  dataset_modality: dataset.modality,
+                  // Image datasets use the Vision Transformer, text datasets the text transformer.
+                  model: dataset.modality === "text" ? "text_transformer" : "transformer",
+                })
+              }
             />
           ))}
         </div>

@@ -7,6 +7,7 @@ import ClientSelection from "./pages/ClientSelection.jsx";
 import Unlearning from "./pages/Unlearning.jsx";
 import Evaluation from "./pages/Evaluation.jsx";
 import RetrainingComparison from "./pages/RetrainingComparison.jsx";
+import ModeComparison from "./pages/ModeComparison.jsx";
 import ExperimentHistory from "./pages/ExperimentHistory.jsx";
 import ProfessorDemo from "./pages/ProfessorDemo.jsx";
 import ModelUpdates from "./pages/ModelUpdates.jsx";
@@ -24,6 +25,7 @@ const ROUTES = [
   { path: "/unlearning", label: "Unlearning", element: <Unlearning /> },
   { path: "/evaluation", label: "Evaluation", element: <Evaluation /> },
   { path: "/comparison", label: "Retraining Comparison", element: <RetrainingComparison /> },
+  { path: "/modes", label: "Method Comparison", element: <ModeComparison /> },
   { path: "/history", label: "Experiment History", element: <ExperimentHistory /> },
   { path: "/updates", label: "Model Updates", element: <ModelUpdates /> },
   { path: "/demo", label: "Professor Demo", element: <ProfessorDemo /> },
@@ -63,6 +65,7 @@ function navSections(stages, config, appMode) {
       items: [
         { path: "/evaluation", label: "Results", done: stages.evaluated },
         { path: "/comparison", label: "Retraining Comparison", done: stages.compared },
+        { path: "/modes", label: "Method Comparison" },
         { path: "/history", label: "Experiment History" },
       ],
     },
