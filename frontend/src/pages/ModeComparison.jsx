@@ -14,6 +14,7 @@ const MODE_ORDER = [
   ["calibrated", "Calibrated GA + KD", "Ascent stops by the calibrated rule (it may take 0 steps), then distillation repair."],
   ["adaptive", "Adaptive GA + KD", "Ascent and repair settings chosen from client heterogeneity."],
   ["graddiff", "GradDiff (untuned)", "Baseline: ascent on the target client and descent on retained clients in one loss, default settings."],
+  ["neggrad_plus", "NegGrad+ (Kurmanji et al., 2023)", "Published baseline: beta x retain loss minus (1 - beta) x forget loss, beta 0.95, plain SGD, as in the paper."],
   ["retain_finetune", "Retain-only fine-tune", "Baseline: no forgetting objective, just keeps training on retained clients."],
 ];
 
