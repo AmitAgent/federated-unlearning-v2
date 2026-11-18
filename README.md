@@ -61,6 +61,59 @@ Every result screen has a collapsible **Experiment Configuration & Seed** panel:
 
 Failures show what failed, which stage, and what to do next (Retry, Run Training, Select Another Experiment, and so on). The technical error is under "Technical details". A stage that runs longer than 15 minutes is stopped and reported; change the limit with `ENGINE_TIMEOUT_MS` (milliseconds). Set `PYTHON_BIN` if your Python is not called `python3`.
 
+## Comparing unlearning methods (real labels)
+
+Besides the dashboard flow above, there is a command-line comparison that scores every unlearning method against the retrained reference, using the same evaluation code for all of them.
+
+**What it compares** (all start from the same trained global model and the same target client):
+
+| Method | What it is |
+|--------|------------|
+| Retrain (reference) | Full retraining without the target client |
+| Fixed GA + KD | Gradient ascent for a fixed step count, then distillation repair |
+| Calibrated GA + KD | Ascent stops by the calibrated rule (it may take 0 steps), then distillation repair |
+| Adaptive GA + KD | Ascent and repair settings chosen from how distinctive the target client's labels are |
+| GradDiff (untuned) | Baseline: ascent on the target client and descent on retained clients in one loss, default settings |
+| Retain-only fine-tune | Baseline: no forgetting objective, keeps training on retained clients only |
+
+Both baselines are our own compact implementations of well-known ideas (`core/unlearning/baselines.py`). They give no formal unlearning guarantee, and neither does GA + KD.
+
+**Real labels.** By default the partitioner skews clients over stand-in labels. Pass `--real-labels` to `core.partitioning.cli` to skew over the dataset's real labels. A partition created from the dashboard still uses the stand-in labels, so use the script below for anything you report. The partition file records `"label_source": "real"` when it is real.
+
+**Run it** (partition, target pick, federated training, unlearning, evaluation, retraining, comparison):
+
+```bash
+bash run_real_label_eval.sh mnist mnist-real 0
+```
+
+The arguments are the dataset, an experiment id and a GPU index. To add only the two baselines to an existing result file: `python -m core.unlearning.compare_modes --experiment-id <id> --which baselines`.
+
+Results are written to `experiments/<id>/mode_comparison.json`. The `experiments/` folder is git-ignored, so these files are not in the repository; re-create them with the script.
+
+**See it in the dashboard.** The **Method Comparison** page (sidebar, under Evaluation) shows `mode_comparison.json` as one table with the gap to the retrained reference, and highlights the closest method in each gap column. It only reads stored results; it never starts a run.
+
+### Result from one run (MNIST, real labels, target client 1, one seed)
+
+| Method | Forget acc | Retained acc | Global acc | MIA | Steps | Time |
+|--------|-----------:|-------------:|-----------:|----:|------:|-----:|
+| Original (before unlearning) | 98.44% | 98.82% | 98.73% | 0.505 | - | - |
+| Retrain (reference) | 97.80% | 98.75% | 98.58% | 0.5075 | - | 98.4 s |
+| Fixed GA + KD | 97.18% | 98.16% | 98.24% | 0.500 | 30 | 42.8 s |
+| Calibrated GA + KD | 98.43% | 99.17% | 98.86% | 0.500 | 0 | 38.3 s |
+| Adaptive GA + KD | 98.48% | 99.07% | 98.76% | 0.505 | 5 | 76.1 s |
+| GradDiff (untuned) | 3.78% | 8.82% | 9.82% | 0.500 | 30 | 3.6 s |
+| Retain-only fine-tune | 97.77% | 98.82% | 98.48% | 0.500 | 200 | 4.7 s |
+
+What this run does and does not show:
+
+- Retain-only fine-tune is the closest method to the retrained model on forget accuracy, and it is much faster than the GA + KD modes. This run does not show that GA + KD, calibrated or adaptive improves on it.
+- Untuned GradDiff collapses to about chance for ten classes. It ran with the same default settings as the other modes and was not tuned for itself, so this says nothing about a tuned GradDiff.
+- Calibrated took 0 ascent steps, so on this run it is effectively distillation on retained clients. Adaptive is not clearly better than calibrated or fixed.
+- The original model scores 98.44% on the target client and the retrained model 97.80%, a gap of 0.64 points. MNIST shows little memorization, so it cannot separate real forgetting from the target's influence washing out through retained clients.
+- MIA is near chance (about 0.5) for every method, and the non-member set has only 200 samples, so it cannot separate the methods.
+- One seed, one target client, one dataset. Differences below about half a point are not statistically meaningful. Times were measured on a shared GPU and are not a controlled benchmark.
+- Not tested: a target client that holds data the retained clients lack, which is where retain-only and ascent-based methods should differ.
+
 ## Phase Index
 
 | Phase | Folder | Title | Status |
@@ -298,7 +351,7 @@ deletion request.
 
 ### Implementation Status
 
-- **Implemented so far:** opt-in calibrated stopping for Gradient Ascent (`--calibrated`), and an opt-in heterogeneity-adaptive controller (`--adaptive`, `core/unlearning/adaptive.py`): it measures how distinctive the target client's label distribution is (Jensen-Shannon divergence vs. all other clients, min-max normalised) and sets the calibration threshold, ascent step cap and KD epochs/alpha from that. The mapping is a simple monotone heuristic with no theoretical guarantee. `python -m core.unlearning.compare_modes --experiment-id <id>` measures fixed vs. calibrated vs. adaptive against the retrained reference. Class-aware KD is not implemented. No result showing adaptive beats fixed is claimed until that comparison has been run and recorded.
+- **Implemented so far:** opt-in calibrated stopping for Gradient Ascent (`--calibrated`), and an opt-in heterogeneity-adaptive controller (`--adaptive`, `core/unlearning/adaptive.py`): it measures how distinctive the target client's label distribution is (Jensen-Shannon divergence vs. all other clients, min-max normalised) and sets the calibration threshold, ascent step cap and KD epochs/alpha from that. The mapping is a simple monotone heuristic with no theoretical guarantee. `python -m core.unlearning.compare_modes --experiment-id <id>` measures fixed vs. calibrated vs. adaptive against the retrained reference. Class-aware KD is not implemented. GradDiff and retain-only fine-tune baselines (`core/unlearning/baselines.py`) are included in that comparison. The comparison has been run once (MNIST, real labels, one seed); it does not show that adaptive beats fixed or calibrated, and a retain-only baseline matched the retrained model most closely. See [Comparing unlearning methods (real labels)](#comparing-unlearning-methods-real-labels).
 -   **Existing project:** Federated-learning and unlearning components
     should be described as implemented only when confirmed in the
     current repository.

@@ -43,6 +43,9 @@ from core.unlearning.unlearning_engine import start_unlearning
 start_unlearning(os.environ["EXP_ID"], int(os.environ["TARGET"]), device="cuda")
 PY
 
+echo "== evaluation (before/after, MIA)"
+python -m core.evaluation.cli --experiment-id "$ID" --device cuda > /dev/null
+
 echo "== retraining baseline"
 python -m core.evaluation.retraining_cli --experiment-id "$ID" --device cuda > /dev/null
 
