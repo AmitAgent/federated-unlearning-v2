@@ -37,7 +37,7 @@ router.param("experimentId", validateExperimentIdParam);
 // persist the full partition to experiments/<id>/partition.json, and
 // return the lightweight summary (Phase 03: Partitioning Engine + API).
 router.post("/", (req, res) => {
-  const { dataset, num_clients, partition_strategy, seed, experiment_id } = req.body || {};
+  const { dataset, num_clients, partition_strategy, seed, experiment_id, alpha, real_labels } = req.body || {};
 
   if (!dataset || !num_clients || !partition_strategy || seed === undefined || !experiment_id) {
     return sendInvalidRequest(
@@ -47,6 +47,19 @@ router.post("/", (req, res) => {
   }
   if (!isValidExperimentId(String(experiment_id))) {
     return sendInvalidRequest(res, "That experiment id is not valid.");
+  }
+
+  // Non-IID splits are built from the dataset's REAL labels (Dirichlet
+  // skew), not stand-in labels: without --real-labels the split is close
+  // to IID for the real labels and unlearning shows no measurable
+  // forgetting. `alpha` (smaller = more skewed) defaults to 0.1; send
+  // real_labels: false to opt out.
+  let alphaValue = 0.1;
+  if (alpha !== undefined && alpha !== null) {
+    alphaValue = Number(alpha);
+    if (!Number.isFinite(alphaValue) || alphaValue <= 0) {
+      return sendInvalidRequest(res, "alpha must be a positive number");
+    }
   }
 
   const args = [
@@ -63,6 +76,10 @@ router.post("/", (req, res) => {
     "--experiment-id",
     String(experiment_id),
   ];
+  if (String(partition_strategy) === "non_iid") {
+    args.push("--alpha", String(alphaValue));
+    if (real_labels !== false) args.push("--real-labels");
+  }
 
   runEngine({
     args,
