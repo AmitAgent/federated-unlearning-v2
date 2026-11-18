@@ -57,6 +57,7 @@ def compare_modes(
     client_id: int | None = None,
     device: str = "cpu",
     which: str = "all",
+    modes: list[str] | None = None,
 ) -> dict:
     """which: 'all' (our 3 modes + baselines), 'core' (our 3 modes), or
     'baselines' (only the established baselines, merged into any existing
@@ -92,7 +93,7 @@ def compare_modes(
 
     out_path = exp_dir / "mode_comparison.json"
     rows: dict[str, dict] = {}
-    if which == "baselines" and out_path.exists():
+    if (which == "baselines" or modes) and out_path.exists():
         rows = json.loads(out_path.read_text()).get("modes", {})
 
     backup = Path(tempfile.mkdtemp(prefix="unlearn-backup-"))
@@ -101,7 +102,8 @@ def compare_modes(
             shutil.copy2(exp_dir / name, backup / name)
 
     try:
-        for mode, kwargs in (MODES.items() if which != "baselines" else []):
+        selected = {m: k for m, k in MODES.items() if not modes or m in modes}
+        for mode, kwargs in (selected.items() if which != "baselines" else []):
             status = start_unlearning(experiment_id, client_id, device=device, **kwargs)
             final = load_final_checkpoint(experiment_id)
             m = evaluate_model_state(
@@ -118,6 +120,10 @@ def compare_modes(
                 "mia_success": m["mia_success"],
                 "ga_steps_completed": ga["steps_completed"],
                 "ga_final_loss": ga["final_loss"],
+                # Diagnostics: did distillation undo what ascent forgot?
+                "ga_stop_reason": (ga.get("calibration") or {}).get("stop_reason"),
+                "forget_acc_original": status["client_influence"]["original"].get(str(client_id)),
+                "forget_acc_after_ascent": status["client_influence"]["after_ascent"].get(str(client_id)),
                 "kd_epochs": status["knowledge_distillation"]["epochs_completed"],
                 "kd_alpha": status["knowledge_distillation"]["alpha"],
                 "duration_seconds": round(status["duration_seconds"], 1),
@@ -137,7 +143,7 @@ def compare_modes(
                 }
             rows[mode] = row
 
-        if which != "core":
+        if which != "core" and not modes:
             retained_pool = [i for c in retained for i in c["indices"]]
             for name, fn in BASELINES.items():
                 t0 = time.time()
@@ -208,6 +214,20 @@ def format_table(result: dict) -> str:
             f"{r['mia_success']:.3f} | {r['ga_steps_completed']} | {r['kd_epochs']} | "
             f"{g.get('forget_accuracy', '-')} | {g.get('retained_accuracy', '-')} |"
         )
+    diag = [
+        f"| {m} | {r.get('ga_stop_reason') or '-'} | "
+        f"{r['forget_acc_original']:.4f} | {r['forget_acc_after_ascent']:.4f} | {r['forget_client_accuracy']:.4f} |"
+        for m, r in result["modes"].items()
+        if r.get("forget_acc_after_ascent") is not None
+    ]
+    if diag:
+        lines += [
+            "",
+            "Diagnostics (forget accuracy: original -> after ascent -> after distillation):",
+            "| mode | GA stop reason | original | after GA | final |",
+            "|---|---|---|---|---|",
+            *diag,
+        ]
     return "\n".join(lines)
 
 
@@ -220,8 +240,18 @@ def main(argv: list[str] | None = None) -> int:
         "--which", default="all", choices=["all", "core", "baselines"],
         help="all = our 3 modes + established baselines; core = our 3 only; baselines = only GradDiff and retain-only fine-tune (merged into an existing result file)",
     )
+    p.add_argument(
+        "--modes", default=None,
+        help="comma-separated subset of our modes to run, e.g. adaptive; "
+             "results are merged into the existing mode_comparison.json (baselines are skipped)",
+    )
     args = p.parse_args(argv)
-    result = compare_modes(args.experiment_id, args.client_id, args.device, args.which)
+    modes = [m.strip() for m in args.modes.split(",")] if args.modes else None
+    if modes:
+        bad = [m for m in modes if m not in MODES]
+        if bad:
+            p.error(f"unknown mode(s) {bad}; choose from {list(MODES)}")
+    result = compare_modes(args.experiment_id, args.client_id, args.device, args.which, modes)
     print(format_table(result))
     print("\nSaved experiments/%s/mode_comparison.json" % args.experiment_id)
     return 0

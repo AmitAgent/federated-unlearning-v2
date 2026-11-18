@@ -60,10 +60,13 @@ def test_settings_endpoints_and_monotonicity():
     lo = adaptive_settings(0.0, steps=30, kd_epochs=5, kd_alpha=0.5)
     hi = adaptive_settings(1.0, steps=30, kd_epochs=5, kd_alpha=0.5)
     assert lo == {"ks_target": 0.15, "steps": 30, "kd_epochs": 5, "kd_alpha": 0.5}
-    assert hi == {"ks_target": 0.05, "steps": 60, "kd_epochs": 10, "kd_alpha": 0.3}
+    assert hi == {"ks_target": 0.05, "steps": 60, "kd_epochs": 5, "kd_alpha": 0.7}
     mid = adaptive_settings(0.5, steps=30, kd_epochs=5, kd_alpha=0.5)
     assert hi["ks_target"] < mid["ks_target"] < lo["ks_target"]
-    assert lo["kd_epochs"] < mid["kd_epochs"] < hi["kd_epochs"]
+    # Distillation is NOT strengthened for distinctive clients (its teacher
+    # still knows the client); weight moves from the teacher to hard labels.
+    assert lo["kd_epochs"] == mid["kd_epochs"] == hi["kd_epochs"]
+    assert lo["kd_alpha"] < mid["kd_alpha"] < hi["kd_alpha"]
 
 
 def test_settings_clamp_out_of_range_h():

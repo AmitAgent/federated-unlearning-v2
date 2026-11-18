@@ -112,3 +112,29 @@ def test_without_calibration_result_has_no_calibration_key():
         dataset=dataset, target_indices=target, steps=3,
     )
     assert "calibration" not in result
+
+
+def test_class_matched_reference_follows_target_label_mix():
+    import random
+    from collections import Counter
+
+    from core.unlearning.unlearning_engine import (
+        CALIBRATION_REFERENCE_OFFSET,
+        class_matched_reference_indices,
+    )
+
+    random.seed(0)
+
+    class FakeTest:
+        targets = [random.randrange(10) for _ in range(10000)]
+
+        def __len__(self):
+            return len(self.targets)
+
+    target_labels = [3] * 650 + [random.randrange(10) for _ in range(350)]
+    idx = class_matched_reference_indices(FakeTest(), target_labels, 10, 500)
+    counts = Counter(FakeTest.targets[i] for i in idx)
+
+    assert len(idx) == 500
+    assert min(idx) >= CALIBRATION_REFERENCE_OFFSET  # never overlaps MIA non-members
+    assert counts[3] > 300  # dominant class dominates the reference too

@@ -8,9 +8,15 @@ how hard to repair.
 
 Hypothesis (to be tested, NOT assumed true): a more distinctive client
 leaves a deeper, more specialised footprint, so the model must be pushed
-closer to "unseen" behaviour (stricter calibration target) and needs more
-repair afterwards (more distillation, leaning on the teacher). A client
-that looks like everyone else needs little of either.
+closer to "unseen" behaviour (stricter calibration target, more ascent
+steps). Repair must then be gentler, not stronger: the distillation teacher
+is the ORIGINAL model, which still holds what the client taught it, so
+extra distillation epochs or a heavier teacher term pull that knowledge
+back (the first measured run under-forgot on a label-skewed split, with
+forget accuracy recovering towards the original model). For a distinctive
+client the controller therefore keeps distillation at its base length and
+shifts weight from the teacher to the hard labels. A client that looks like
+everyone else needs little of any of this.
 
 The mapping is a deliberately simple, monotone, clamped heuristic. It is
 NOT derived from theory and carries no forgetting guarantee. Whether it
@@ -35,8 +41,8 @@ from core.unlearning.heterogeneity import (
 # Ends of each controlled setting: value at h = 0 -> value at h = 1.
 KS_TARGET_RANGE = (0.15, 0.05)   # stop ascent when KS distance <= this
 STEPS_CAP_SCALE = 1.0            # ascent step cap = base_steps * (1 + h * this)
-KD_EPOCHS_SCALE = 1.0            # kd epochs = base * (1 + h * this)
-KD_ALPHA_DROP = 0.4              # kd alpha = base * (1 - h * this)
+KD_EPOCHS_SCALE = 0.0            # kd epochs = base * (1 + h * this); 0 = no extra distillation
+KD_ALPHA_RISE = 0.4              # kd alpha = base * (1 + h * this); more weight on hard labels
 HETEROGENEITY_SATURATION = 0.2   # JS divergence at which h reaches 1 (untuned)
 
 
@@ -66,7 +72,7 @@ def adaptive_settings(
         "ks_target": round(ks_lo + (ks_hi - ks_lo) * h, 4),
         "steps": max(1, int(round(steps * (1 + STEPS_CAP_SCALE * h)))),
         "kd_epochs": max(1, int(round(kd_epochs * (1 + KD_EPOCHS_SCALE * h)))),
-        "kd_alpha": round(max(0.05, min(1.0, kd_alpha * (1 - KD_ALPHA_DROP * h))), 4),
+        "kd_alpha": round(max(0.05, min(1.0, kd_alpha * (1 + KD_ALPHA_RISE * h))), 4),
     }
 
 

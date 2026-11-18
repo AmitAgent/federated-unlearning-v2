@@ -1,5 +1,7 @@
 # Results
 
+> Algorithm versions (v1 baseline, v2 candidate), assumptions and how to revert: see [`algorithm_history.md`](./algorithm_history.md). The numbers below are v1.
+
 All numbers come from `experiments/<id>/mode_comparison.json` produced by
 `python -m core.unlearning.compare_modes --which all`.
 
