@@ -230,3 +230,6 @@ class RemoteHttpBackend(ComputeBackend):
 
     def run_evaluation(self, experiment_id: str, **kwargs: Any) -> dict[str, Any]:
         return self._run_job("/run_evaluation", experiment_id, {"experiment_id": experiment_id, **kwargs})
+
+    def run_mode_comparison(self, experiment_id: str, **kwargs: Any) -> dict[str, Any]:
+        return self._run_job("/run_mode_comparison", experiment_id, {"experiment_id": experiment_id, **kwargs})

@@ -53,6 +53,7 @@ JOB_OPS = {
     "/start_unlearning": "start_unlearning",
     "/run_federated_training": "run_federated_training",
     "/run_evaluation": "run_evaluation",
+    "/run_mode_comparison": "run_mode_comparison",
 }
 
 

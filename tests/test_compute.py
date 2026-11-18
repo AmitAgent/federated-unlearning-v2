@@ -122,7 +122,11 @@ def test_local_backend_start_unlearning_forwards_every_kwarg(monkeypatch):
     monkeypatch.setattr(local_backend_module, "_start_unlearning", fake_start_unlearning)
     result = LocalBackend().start_unlearning(experiment_id="e", client_id=2, steps=10, lr=0.05)
     assert result == {"status": "complete"}
-    assert captured == {"experiment_id": "e", "client_id": 2, "steps": 10, "lr": 0.05}
+    # Jobs not given a device get the best available one (the engines default to CPU).
+    assert captured == {
+        "experiment_id": "e", "client_id": 2, "steps": 10, "lr": 0.05,
+        "device": local_backend_module._default_device(),
+    }
 
 
 # -- DemoBackend -----------------------------------------------------------

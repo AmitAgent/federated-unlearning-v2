@@ -1,13 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "../lib/api.js";
+import { useExperimentConfig } from "../state/ExperimentContext.jsx";
 import ErrorPanel from "../components/ErrorPanel.jsx";
 import ProvenanceBadge from "../components/ProvenanceBadge.jsx";
+import BackendTraceNote from "../components/BackendTraceNote.jsx";
 
 // Method Comparison -- every unlearning mode next to the retrained
 // reference, read from experiments/<id>/mode_comparison.json (written
-// by `python -m core.unlearning.compare_modes`). Read-only: it never
-// starts a run. Gaps are computed here from the stored accuracies, so
-// older files without a gap field still display correctly.
+// by `python -m core.unlearning.compare_modes`). The table itself is
+// read-only; the "Run comparison" panel starts a new run on the chosen
+// compute backend and then shows the result. Gaps are computed here from
+// the stored accuracies, so older files without a gap field still display.
+
+// What a run covers. "baselines" = GradDiff, NegGrad+ and retain-only.
+const RUN_CHOICES = [
+  { key: "all", label: "All methods (ours + GradDiff, NegGrad+, retain-only)", body: { which: "all" } },
+  { key: "baselines", label: "Baselines only (GradDiff, NegGrad+, retain-only)", body: { which: "baselines" } },
+  { key: "core", label: "Our three modes only (fixed, calibrated, adaptive)", body: { which: "core" } },
+  { key: "adaptive", label: "Adaptive only (merges into the stored table)", body: { which: "core", modes: ["adaptive"] } },
+];
 
 const MODE_ORDER = [
   ["fixed", "Fixed GA + KD", "Gradient ascent for a fixed step count, then distillation repair."],
@@ -76,6 +87,33 @@ export default function ModeComparison() {
   const [comparison, setComparison] = useState(null);
   const [status, setStatus] = useState("loading"); // loading | ready | error
   const [error, setError] = useState(null);
+  const { config, appMode } = useExperimentConfig();
+  const [runChoice, setRunChoice] = useState("all");
+  const [runStatus, setRunStatus] = useState("idle"); // idle | running | done | error
+  const [runError, setRunError] = useState(null);
+  const [backendTrace, setBackendTrace] = useState(null);
+  const demo = appMode === "demo" || config.compute_backend === "demo";
+
+  async function runComparison() {
+    const choice = RUN_CHOICES.find((c) => c.key === runChoice) || RUN_CHOICES[0];
+    setRunStatus("running");
+    setRunError(null);
+    setBackendTrace(null);
+    try {
+      const data = await apiFetch("/api/mode-comparison", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ experiment_id: experimentId, backend: config.compute_backend, ...choice.body }),
+      });
+      setComparison(data.comparison);
+      setStatus("ready");
+      setBackendTrace(data.backend_trace ?? null);
+      setRunStatus("done");
+    } catch (err) {
+      setRunError(err);
+      setRunStatus("error");
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -164,6 +202,50 @@ export default function ModeComparison() {
             dataset {comparison.dataset ?? "—"} · target client {comparison.target_client_id ?? "—"}
           </span>
         )}
+      </div>
+
+      <div className="mt-4 max-w-3xl rounded-lg border border-gray-200 bg-white p-4 text-sm">
+        <h3 className="font-semibold text-gray-900">Run comparison</h3>
+        <p className="mt-1 text-xs text-gray-500">
+          Runs every selected method from the same trained model on the compute backend chosen in the
+          Compute Backend panel (currently <span className="font-mono">{config.compute_backend}</span>) and scores
+          each against the retrained reference. The experiment needs a trained model and a retraining baseline.
+          With a transformer this can take a long time; nothing stops it early.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <select
+            aria-label="What to run"
+            value={runChoice}
+            onChange={(e) => setRunChoice(e.target.value)}
+            disabled={runStatus === "running"}
+            className="rounded-md border border-gray-300 bg-white px-2 py-1 text-xs"
+          >
+            {RUN_CHOICES.map((c) => (
+              <option key={c.key} value={c.key}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={runComparison}
+            disabled={!experimentId || runStatus === "running" || demo}
+            className="rounded-md bg-indigo-600 px-3 py-1 text-xs font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            {runStatus === "running" ? "Running… (this can take a while)" : "Run comparison"}
+          </button>
+        </div>
+        {demo && (
+          <p className="mt-2 text-xs text-amber-700">
+            Demo mode only replays stored results. Choose Local or a GPU backend to run a new comparison.
+          </p>
+        )}
+        {runStatus === "error" && (
+          <div className="mt-3">
+            <ErrorPanel error={runError} onRetry={runComparison} />
+          </div>
+        )}
+        {runStatus === "done" && <div className="mt-3"><BackendTraceNote trace={backendTrace} /></div>}
       </div>
 
       {status === "loading" && <p className="mt-6 text-sm text-gray-500">Loading…</p>}

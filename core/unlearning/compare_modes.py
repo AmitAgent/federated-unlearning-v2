@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -72,7 +73,8 @@ def compare_modes(
         print(
             "WARNING: no retraining baseline for this experiment, so gap-to-retrain "
             "cannot be computed. Run `python -m core.evaluation.retraining_cli "
-            f"--experiment-id {experiment_id}` first for the full comparison."
+            f"--experiment-id {experiment_id}` first for the full comparison.",
+            file=sys.stderr,  # stdout stays clean for --json
         )
     if client_id is None:
         if retrain is not None:
@@ -245,13 +247,41 @@ def main(argv: list[str] | None = None) -> int:
         help="comma-separated subset of our modes to run, e.g. adaptive; "
              "results are merged into the existing mode_comparison.json (baselines are skipped)",
     )
+    p.add_argument(
+        "--backend", default=None,
+        help="Run on a compute backend (college_gpu | colab | local | auto) instead of in this process. "
+             "Used by the dashboard.",
+    )
+    p.add_argument("--json", action="store_true", help="Print JSON instead of a table (used by the dashboard).")
     args = p.parse_args(argv)
     modes = [m.strip() for m in args.modes.split(",")] if args.modes else None
     if modes:
         bad = [m for m in modes if m not in MODES]
         if bad:
             p.error(f"unknown mode(s) {bad}; choose from {list(MODES)}")
-    result = compare_modes(args.experiment_id, args.client_id, args.device, args.which, modes)
+    trace = None
+    if args.backend is not None:
+        from core.compute.base import BackendUnavailableError, NotSupportedError
+        from core.compute.registry import call_with_fallback
+
+        try:
+            result, trace = call_with_fallback(
+                args.backend, "run_mode_comparison",
+                experiment_id=args.experiment_id, client_id=args.client_id,
+                which=args.which, modes=modes,
+            )
+        except (BackendUnavailableError, NotSupportedError, FileNotFoundError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+    else:
+        try:
+            result = compare_modes(args.experiment_id, args.client_id, args.device, args.which, modes)
+        except (FileNotFoundError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+    if args.json:
+        print(json.dumps({"comparison": result, "backend_trace": trace}))
+        return 0
     print(format_table(result))
     print("\nSaved experiments/%s/mode_comparison.json" % args.experiment_id)
     return 0

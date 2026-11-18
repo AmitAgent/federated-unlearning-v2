@@ -43,6 +43,15 @@ def detect_device() -> str:
     return "cpu"
 
 
+def _default_device() -> str:
+    """Device for jobs that were not given one: COMPUTE_DEVICE if set (e.g.
+    "cpu" to force CPU), otherwise CUDA -> MPS -> CPU. The engines themselves
+    default to "cpu", so without this a GPU machine would still train on CPU."""
+    import os
+
+    return os.environ.get("COMPUTE_DEVICE") or detect_device()
+
+
 class LocalBackend(ComputeBackend):
     kind = "local"
     name = "Local (Mac / CPU / CUDA)"
@@ -84,6 +93,7 @@ class LocalBackend(ComputeBackend):
         return load_fl_history(experiment_id)
 
     def start_unlearning(self, experiment_id: str, client_id: int, **kwargs: Any) -> dict[str, Any]:
+        kwargs.setdefault("device", _default_device())
         return _start_unlearning(experiment_id=experiment_id, client_id=client_id, **kwargs)
 
     def get_unlearning_status(self, experiment_id: str) -> dict[str, Any]:
@@ -99,7 +109,26 @@ class LocalBackend(ComputeBackend):
     # same way for Local -- RemoteHttpBackend mirrors this below.
     def run_federated_training(self, experiment_id: str, **kwargs: Any) -> dict[str, Any]:
         partition = load_partition(experiment_id)
+        kwargs.setdefault("device", _default_device())
         return _run_federated_training(experiment_id=experiment_id, partition=partition, **kwargs)
 
     def run_evaluation(self, experiment_id: str, non_member_sample_size: int = DEFAULT_NON_MEMBER_SAMPLE_SIZE, **kwargs: Any) -> dict[str, Any]:
+        kwargs.setdefault("device", _default_device())
         return evaluate_experiment(experiment_id=experiment_id, non_member_sample_size=non_member_sample_size, **kwargs)
+
+    def run_mode_comparison(
+        self,
+        experiment_id: str,
+        client_id: int | None = None,
+        which: str = "all",
+        modes: list[str] | None = None,
+        device: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Our unlearning modes plus the GradDiff / NegGrad+ / retain-only
+        baselines, each scored against the retrained reference (writes
+        experiments/<id>/mode_comparison.json). Imported lazily: it pulls in
+        torch and the datasets."""
+        from core.unlearning.compare_modes import compare_modes
+
+        return compare_modes(experiment_id, client_id, device or _default_device(), which, modes)

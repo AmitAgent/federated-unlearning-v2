@@ -50,3 +50,9 @@ class DemoBackend(LocalBackend):
             "The Demo backend serves precomputed experiments only -- switch to Local or a "
             "configured GPU backend to run new evaluation."
         )
+
+    def run_mode_comparison(self, experiment_id: str, **kwargs: Any) -> dict[str, Any]:
+        raise NotSupportedError(
+            "The Demo backend serves precomputed experiments only -- switch to Local or a "
+            "configured GPU backend to run a new method comparison."
+        )

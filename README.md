@@ -59,7 +59,7 @@ Every result screen has a collapsible **Experiment Configuration & Seed** panel:
 
 ## When something fails
 
-Failures show what failed, which stage, and what to do next (Retry, Run Training, Select Another Experiment, and so on). The technical error is under "Technical details". A stage that runs longer than 15 minutes is stopped and reported; change the limit with `ENGINE_TIMEOUT_MS` (milliseconds). Set `PYTHON_BIN` if your Python is not called `python3`.
+Failures show what failed, which stage, and what to do next (Retry, Run Training, Select Another Experiment, and so on). The technical error is under "Technical details". Engine runs have no time limit by default; to add one, set `ENGINE_TIMEOUT_MS` (milliseconds) in `backend/.env`. Set `PYTHON_BIN` if your Python is not called `python3`.
 
 ## Phase Index
 

@@ -8,15 +8,13 @@ import { spawn } from "child_process";
 import { REPO_ROOT, readArtifact } from "./artifacts.js";
 import { STAGE_LABELS, sendBadOutput, sendFailure } from "./errors.js";
 
-// A live run that has not answered after this long is treated as a
-// failure, so the dashboard shows an error and a fallback option
-// instead of an endless spinner during a presentation. Spec Ch.37's
-// "maximum practical demo" is ~10 minutes; the default leaves headroom.
-const DEFAULT_TIMEOUT_MS = 15 * 60 * 1000;
-
+// By default a run is NOT time-limited: a Vision Transformer on a GPU can
+// take 10 to 30 minutes or more, and a fixed cap kept stopping real runs and
+// offering "Retry". To put a limit back, set ENGINE_TIMEOUT_MS (milliseconds,
+// e.g. 3600000 for one hour) in backend/.env. Unset, empty or 0 means no limit.
 function timeoutMs() {
   const fromEnv = Number(process.env.ENGINE_TIMEOUT_MS);
-  return Number.isFinite(fromEnv) && fromEnv > 0 ? fromEnv : DEFAULT_TIMEOUT_MS;
+  return Number.isFinite(fromEnv) && fromEnv > 0 ? fromEnv : null;
 }
 
 /**
@@ -35,30 +33,34 @@ export function runEngine({ args, stage, res, experimentId, onSuccess }) {
   py.stdout.on("data", (chunk) => (stdout += chunk));
   py.stderr.on("data", (chunk) => (stderr += chunk));
 
-  // On timeout, answer the browser immediately and then kill the
-  // process -- do not wait for the process's own "close" event, because
-  // a child that outlives its parent can keep the output pipes open and
-  // delay that event long after the deadline.
-  const timer = setTimeout(() => {
-    if (!res.headersSent) {
-      res.status(504).json({
-        error: "The run took too long and was stopped.",
-        code: "ENGINE_TIMEOUT",
-        stage: STAGE_LABELS[stage] || stage,
-        detail: `No result after ${Math.round(timeoutMs() / 1000)} seconds.`,
-        retryable: true,
-      });
-    }
-    py.kill("SIGKILL");
-  }, timeoutMs());
+  // Optional limit (see timeoutMs). On timeout, answer the browser
+  // immediately and then kill the process -- do not wait for the process's
+  // own "close" event, because a child that outlives its parent can keep the
+  // output pipes open and delay that event long after the deadline.
+  const limit = timeoutMs();
+  const timer =
+    limit === null
+      ? null
+      : setTimeout(() => {
+          if (!res.headersSent) {
+            res.status(504).json({
+              error: "The run took too long and was stopped.",
+              code: "ENGINE_TIMEOUT",
+              stage: STAGE_LABELS[stage] || stage,
+              detail: `No result after ${Math.round(limit / 1000)} seconds.`,
+              retryable: true,
+            });
+          }
+          py.kill("SIGKILL");
+        }, limit);
 
   py.on("error", (spawnError) => {
-    clearTimeout(timer);
+    if (timer) clearTimeout(timer);
     sendFailure(res, { stage, spawnError });
   });
 
   py.on("close", (code) => {
-    clearTimeout(timer);
+    if (timer) clearTimeout(timer);
     if (res.headersSent) return;
 
     if (code !== 0) {

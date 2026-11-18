@@ -63,5 +63,5 @@ HTTPS in front of the server; do not send the key over plain `http://` across a 
 | `HTTP 530` / `1033` | The Cloudflare tunnel is down: re-run the notebook's tunnel cell, update `COLAB_BASE_URL` |
 | `Another job is already running` | The server is busy; wait for it to finish |
 
-A run longer than 15 minutes is also cut off by the Express layer: raise `ENGINE_TIMEOUT_MS` in `backend/.env`
-(milliseconds) for long CIFAR runs.
+The Express layer no longer cuts runs off by default. If you set `ENGINE_TIMEOUT_MS` in `backend/.env`
+(milliseconds), runs longer than that are stopped; leave it unset for long Vision Transformer / CIFAR runs.

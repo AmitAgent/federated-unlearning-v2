@@ -25,6 +25,7 @@ export const STAGE_LABELS = {
   evaluation: "Evaluation",
   retraining: "Full Retraining",
   release: "Model Release",
+  comparison: "Method Comparison",
   dataset: "Dataset Loading",
   artifact: "Stored Artifact",
 };
