@@ -2,11 +2,12 @@
 
 ## Workflow
 
-- Work through `phase-XX-*/` folders in order (see root `README.md`).
-- Before starting a phase, read its `README.md` in full — especially
-  "Depends On" and "Out of Scope".
-- Update that phase's **Status** line and **Progress Log** table as work
-  happens.
+- Read `README.md` and `docs/CODE_MAP.md` first; they say where each part of the
+  project lives.
+- Run the tests before and after a change: `python -m pytest tests -q`.
+- Add or update a test with every behavior change, and keep new methods opt-in so
+  stored results do not change.
+- Be honest in docs: do not claim a result that has not been measured and recorded.
 
 ## Repo layout
 
@@ -15,7 +16,7 @@ frontend/     React (Vite) dashboard — UI only, no ML logic
 backend/      Node/Express API — routes requests to a ComputeBackend
 core/         Python ML logic (datasets, federated, unlearning, evaluation)
 experiments/  Generated experiment artifacts (gitignored contents)
-docs/         Architecture doc + full dashboard specification
+docs/         Architecture doc, specification, results, guides, code map
 ```
 
 ## Coding conventions
@@ -29,7 +30,7 @@ docs/         Architecture doc + full dashboard specification
 - **Core**: standard Python, one concern per module, following the
   `core/federated/`, `core/unlearning/`, `core/evaluation/`,
   `core/datasets/` split from spec Ch. 49.
-- Keep phases isolated — don't reach ahead into a later phase's scope.
+- Keep changes small and focused: one concern per change.
 
 ## Environment variables
 
