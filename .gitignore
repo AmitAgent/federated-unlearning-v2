@@ -14,3 +14,4 @@ cnn-to-transformer.patch
 comparisons/
 text-transformer.patch
 text-transformer.patch
+run_mnist.log
