@@ -55,6 +55,7 @@ def fedavg_train(
     batch_size: int = 32,
     eval_batch_size: int = 256,
     device: str = "cpu",
+    round_callback=None,
 ) -> dict:
     """Run the full FedAvg loop for `rounds` rounds *without* persisting anything.
 
@@ -65,6 +66,14 @@ def fedavg_train(
     retraining baseline can run the exact same loop against a
     partition with the target client removed, without overwriting the
     original experiment's ``fl_history.json``/``global_model.pt``.
+
+    `round_callback` is an optional read-only observer, called once per
+    round right after aggregation as
+    ``round_callback(round_num, global_before, client_reports, global_after)``.
+    It is how FedEraser records the per-round client updates it needs
+    (core.unlearning.federaser.RoundLogger). It must not modify its
+    arguments. When it is None (the default) this function behaves
+    exactly as before.
     """
     if rounds < 1:
         raise ValueError("rounds must be >= 1")
@@ -131,10 +140,13 @@ def fedavg_train(
         if not contributing:
             raise ValueError("No client had any samples to train on this round")
 
+        global_before = global_state
         global_state = federated_average(
             [c["state_dict"] for c in contributing],
             [c["num_samples"] for c in contributing],
         )
+        if round_callback is not None:
+            round_callback(round_num, global_before, contributing, global_state)
         global_model.load_state_dict(global_state)
         accuracy, loss = _evaluate(global_model, test_loader, device)
 
