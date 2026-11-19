@@ -49,6 +49,14 @@ Every result screen shows one label, so you always know where a number came from
 
 Nothing is invented: an unfinished or unreadable stored result is refused with a clear message instead of being drawn as if it were final.
 
+## FedEraser (additional method)
+
+Method Comparison also has a row for FedEraser (Wang et al., 2021), a published
+history-based method that replays recorded training rounds without the target
+client. It runs from the command line (`python -m core.unlearning.federaser_cli
+--experiment-id <id>`), and its default settings are untuned. See
+[`docs/FEDERASER.md`](./docs/FEDERASER.md).
+
 ## Reproducibility
 
 Every result screen has a collapsible **Experiment Configuration & Seed** panel: dataset, clients, partition, seed, model, rounds, local epochs, unlearning method and hyperparameters, target client, and the software version (git commit). Values the stored files do not contain are shown as "not recorded", never guessed. Runs made before Phase 15 do not have unlearning hyperparameters saved; re-run unlearning to record them.
