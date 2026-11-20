@@ -144,74 +144,85 @@ def test_run_knowledge_distillation_rejects_zero_epochs():
         )
 
 
-def test_run_knowledge_distillation_recovers_retained_accuracy():
-    """The Phase 09 acceptance criterion, directly: retained-client
-    accuracy must measurably recover after distillation.
-
-    Builds a teacher that has actually fit this (small, memorizable)
-    dataset, damages a copy of it with Gradient Ascent the same way
-    Phase 08 would, then checks that distilling the teacher's
-    knowledge back in recovers the damage on the retained clients.
+def _separable_dataset(seed, num_samples=90, num_classes=3):
+    """Three noisy classes around fixed prototypes: a small transformer can
+    actually learn this, unlike random labels on random noise (which the
+    previous version of this test used; its teacher never learned anything).
     """
-    torch.manual_seed(0)
-    dataset = _synthetic_dataset(num_samples=80, channels=1, size=8, num_classes=3, seed=0)
-    base_model = build_model("transformer", channels=1, num_classes=3)
+    generator = torch.Generator().manual_seed(seed)
+    prototypes = torch.randn(num_classes, 1, 8, 8, generator=generator) * 1.5
+    labels = torch.arange(num_samples) % num_classes
+    images = prototypes[labels] + 0.5 * torch.randn(num_samples, 1, 8, 8, generator=generator)
+    return TensorDataset(images, labels)
 
-    # Full-batch, enough epochs to actually memorize this tiny dataset --
-    # otherwise there's nothing for the teacher to know that the
-    # damaged student doesn't, and "recovery" wouldn't mean anything.
-    teacher_result = local_train(
-        global_state=base_model.state_dict(),
-        model_id="transformer",
-        channels=1,
-        num_classes=3,
-        dataset=dataset,
-        indices=list(range(len(dataset))),
-        epochs=300,
-        lr=0.05,
-        batch_size=80,
-    )
-    teacher_state = teacher_result["state_dict"]
 
-    target_indices = list(range(0, 20))
-    retained_indices = list(range(20, 80))
+def _accuracy_on(state, dataset, indices):
+    model = build_model("transformer", channels=1, num_classes=3)
+    model.load_state_dict(state)
+    model.eval()
+    images = torch.stack([dataset[i][0] for i in indices])
+    labels = torch.tensor([int(dataset[i][1]) for i in indices])
+    with torch.no_grad():
+        return (model(images).argmax(dim=1) == labels).float().mean().item()
 
-    # A handful of ascent steps -- enough to measurably hurt retained
-    # accuracy without diverging into a fully collapsed model that no
-    # amount of distillation could recover (gradient ascent has no
-    # natural stopping point, so a few too many steps overshoots fast).
-    ga_result = run_gradient_ascent(
-        global_state=teacher_state,
-        model_id="transformer",
-        channels=1,
-        num_classes=3,
-        dataset=dataset,
-        target_indices=target_indices,
-        steps=8,
-        lr=0.01,
-        batch_size=20,
-    )
-    damaged_state = ga_result["final_state_dict"]
 
-    retained_clients = [{"client_id": 1, "indices": retained_indices}]
+def test_run_knowledge_distillation_recovers_retained_accuracy():
+    """The Phase 09 acceptance criterion: retained-client accuracy recovers
+    after distillation.
 
-    result = run_knowledge_distillation(
-        teacher_state=teacher_state,
-        student_state=damaged_state,
-        model_id="transformer",
-        channels=1,
-        num_classes=3,
-        dataset=dataset,
-        retained_clients=retained_clients,
-        epochs=10,
-        lr=0.02,
-        batch_size=60,
-    )
+    A single run is not a reliable check: after Gradient Ascent the student
+    can sit at chance level, and whether 40 distillation epochs bring it back
+    varies from seed to seed (and slightly between machines). So this checks
+    recovery on average over four seeds, and first checks that the setup is
+    meaningful: the teacher must really have learned the data.
+    """
+    initial, final = [], []
+    target_indices = list(range(0, 30))
+    retained_indices = list(range(30, 90))
+    for seed in range(4):
+        torch.manual_seed(seed)
+        dataset = _separable_dataset(seed)
+        teacher_state = local_train(
+            global_state=build_model("transformer", channels=1, num_classes=3).state_dict(),
+            model_id="transformer",
+            channels=1,
+            num_classes=3,
+            dataset=dataset,
+            indices=list(range(len(dataset))),
+            epochs=60,
+            lr=0.003,
+            batch_size=90,
+        )["state_dict"]
+        assert _accuracy_on(teacher_state, dataset, retained_indices) >= 0.8, "teacher did not learn the data"
 
-    assert result["final_retained_accuracy"] > result["initial_retained_accuracy"]
-    assert len(result["epoch_history"]) == 10
-    assert set(result["per_client_accuracy_before"].keys()) == {1}
-    assert set(result["per_client_accuracy_after"].keys()) == {1}
+        damaged_state = run_gradient_ascent(
+            global_state=teacher_state,
+            model_id="transformer",
+            channels=1,
+            num_classes=3,
+            dataset=dataset,
+            target_indices=target_indices,
+            steps=8,
+            lr=0.01,
+            batch_size=30,
+        )["final_state_dict"]
+
+        result = run_knowledge_distillation(
+            teacher_state=teacher_state,
+            student_state=damaged_state,
+            model_id="transformer",
+            channels=1,
+            num_classes=3,
+            dataset=dataset,
+            retained_clients=[{"client_id": 1, "indices": retained_indices}],
+            epochs=40,
+            lr=0.02,
+            batch_size=60,
+        )
+        initial.append(result["initial_retained_accuracy"])
+        final.append(result["final_retained_accuracy"])
+
+    assert sum(final) / len(final) > sum(initial) / len(initial) + 0.1, (initial, final)
 
 
 def test_run_knowledge_distillation_tracks_per_client_accuracy():

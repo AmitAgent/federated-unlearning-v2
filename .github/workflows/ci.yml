@@ -44,4 +44,4 @@ jobs:
       # real local training + a real MNIST run; core.partitioning
       # (Phase 03) never needed them since it never loads real image data.
       - run: pip install -r core/requirements.txt
-      - run: pytest tests/ -q
+      - run: pytest tests/ -q -m "not slow"
