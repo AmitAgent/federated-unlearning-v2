@@ -1,10 +1,10 @@
-"""CLI entrypoint the Express backend shells out to (Phase 08 + 09).
+"""CLI entrypoint the Express backend shells out to.
 
     python -m core.unlearning.cli --experiment-id demo-1 --client-id 3 \\
         --steps 30 --lr 0.01 --kd-epochs 5 --kd-lr 0.01
 
-Requires that experiment ``demo-1`` already has a partition (Phase 03)
-and a trained global model checkpoint (Phase 05) saved. Runs the
+Requires that experiment ``demo-1`` already has a partition
+and a trained global model checkpoint saved. Runs the
 Gradient Ascent stage against the given client's local data, followed
 by Knowledge Distillation against every other client, persists the
 resulting status + both stages' weights, and prints that same status
@@ -45,7 +45,7 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Heterogeneity-adaptive mode: measure how distinctive the target client's labels are and set the calibration threshold, step cap and KD strength from that (implies --calibrated).",
     )
-    # Phase 14: optional compute backend selection. Omitted (the
+    # Optional compute backend selection. Omitted (the
     # default) behaves exactly as before this flag existed.
     parser.add_argument(
         "--backend",

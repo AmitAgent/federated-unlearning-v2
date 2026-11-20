@@ -1,7 +1,7 @@
-"""Phase 15 tests: reproducibility metadata and the acceptance checker.
+"""Reproducibility metadata and the acceptance checker.
 
 Everything here is torch-free on purpose -- the acceptance checker only
-reads JSON, and the whole point of Phase 15 is that the research story
+reads JSON, and the whole point of this feature is that the research story
 can be verified and replayed on a machine with no GPU and no backend.
 Experiments are built as small synthetic artifact folders in tmp_path,
 so no dataset download or training is needed.
@@ -194,7 +194,7 @@ def test_complete_experiment_passes_everything(tmp_path):
     assert all(c["status"] == PASS for c in report["checks"])
 
 
-def test_pre_phase15_run_warns_but_does_not_fail(tmp_path):
+def test_run_without_recorded_settings_warns_but_does_not_fail(tmp_path):
     # An older unlearning run has no recorded hyperparameters/software.
     make_experiment(tmp_path, hyperparameters=False)
     report = validate_experiment("exp-ok", tmp_path)

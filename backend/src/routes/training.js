@@ -8,11 +8,11 @@ router.param("experimentId", validateExperimentIdParam);
 
 // POST /api/training -> run core/federated (Python) FedAvg loop for this
 // experiment, persist the round-by-round history to
-// experiments/<id>/fl_history.json, and return it (Phase 05: FL Engine
+// experiments/<id>/fl_history.json, and return it (FL Engine
 // + API). Requires that /api/partition has already been run for this
 // experiment_id -- the training CLI loads that saved partition.
 //
-// Phase 15: failures come back as structured errors (see errors.js),
+// Failures come back as structured errors (see errors.js),
 // and the experiment id is validated before it reaches the filesystem.
 router.post("/", (req, res) => {
   const { experiment_id, model, federated_rounds, local_epochs, seed, backend } = req.body || {};
@@ -41,8 +41,8 @@ router.post("/", (req, res) => {
     "--seed",
     String(seed),
   ];
-  // Phase 14: optional compute backend selection (college_gpu | colab |
-  // local | demo | auto). Omitted -> identical to pre-Phase-14 behavior,
+  // Optional compute backend selection (college_gpu | colab |
+  // local | demo | auto). Omitted -> identical to previous behavior,
   // run in-process; the CLI's output shape only changes when this flag
   // is present (adds backend_trace alongside history).
   if (backend !== undefined) args.push("--backend", String(backend));

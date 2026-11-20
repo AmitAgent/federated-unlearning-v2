@@ -1,4 +1,4 @@
-"""Phase 11 tests: full-retraining baseline + comparison.
+"""Full-retraining baseline + comparison.
 
 The comparison-math tests are pure data and run without torch. The
 pipeline tests need torch and run against an in-memory synthetic
@@ -234,7 +234,7 @@ def test_retraining_baseline_full_pipeline(pipeline):
     assert results["protocol"]["lr"] == pytest.approx(0.1)
     assert results["protocol"]["hyperparameters_recorded"] is True
     assert len(results["round_history"]) == 2
-    # Same four metrics, scored on the same basis as Phase 10.
+    # Same four metrics, scored on the same basis as the evaluation engine.
     m = results["metrics"]
     for key in ("global_accuracy", "forget_client_accuracy", "retained_client_accuracy", "mia_success"):
         assert 0.0 <= m[key] <= 1.0
@@ -310,7 +310,7 @@ def test_retraining_rejects_stale_evaluation_for_different_target(pipeline):
 
 
 def test_retraining_falls_back_to_legacy_defaults_for_old_histories(pipeline):
-    """fl_history.json written before Phase 11 has no lr/batch_size."""
+    """fl_history.json written before retraining support has no lr/batch_size."""
     path = pipeline["dir"] / pipeline["exp"] / "fl_history.json"
     history = json.loads(path.read_text())
     history.pop("lr"), history.pop("batch_size")

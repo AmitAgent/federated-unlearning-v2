@@ -12,8 +12,7 @@ const router = Router();
 
 // GET /api/compute/status -> the status of every compute backend
 // (College GPU, Google Colab, Local, Demo) plus which one Auto mode
-// would currently select and the full trace of what it tried (Phase
-// 14). Shells out to core.compute.cli, which is the only code that
+// would currently select and the full trace of what it tried. Shells out to core.compute.cli, which is the only code that
 // ever touches the COLLEGE_GPU_* / COLAB_* environment variables --
 // this route, and everything in the browser, only ever sees the
 // credential-free status JSON that CLI prints (see
@@ -51,7 +50,7 @@ router.get("/status", (req, res) => {
   });
 });
 
-// Phase 15 (Spec Ch.71.12: "The presentation must remain functional even
+// (Spec Ch.71.12: "The presentation must remain functional even
 // when no remote GPU is reachable"). If the Python status probe itself
 // cannot run, the dashboard still works for every STORED experiment --
 // those are read as JSON directly by the Express routes, with no Python

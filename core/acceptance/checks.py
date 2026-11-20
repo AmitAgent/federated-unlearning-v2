@@ -25,7 +25,7 @@ Each check returns one of:
     pass  the artifact satisfies the requirement
     fail  the requirement is violated (or the artifact is missing)
     warn  not violated, but not fully recorded -- e.g. a run made
-          before Phase 15 that predates the hyperparameter record
+          before unlearning settings were recorded that predates the hyperparameter record
 """
 from __future__ import annotations
 
@@ -339,7 +339,7 @@ def _check_reproducibility(r: _Report, partition: dict | None, history: dict | N
              f"commit {unlearning['software'].get('git_commit') or 'unknown'}")
     elif unlearning:
         r.warn(sec, "unlearning_hyperparameters", "Unlearning hyperparameters and software version are stored",
-               "not recorded -- this run was made before Phase 15; re-run unlearning to record them")
+               "not recorded -- this run was made before unlearning settings were recorded; re-run unlearning to record them")
 
 
 def validate_experiment(experiment_id: str, experiments_dir: Path | None = None) -> dict[str, Any]:

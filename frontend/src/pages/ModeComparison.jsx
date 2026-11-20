@@ -27,7 +27,7 @@ const MODE_ORDER = [
   ["graddiff", "GradDiff (untuned)", "Baseline: ascent on the target client and descent on retained clients in one loss, default settings."],
   ["neggrad_plus", "NegGrad+ (Kurmanji et al., 2023)", "Published baseline: beta x retain loss minus (1 - beta) x forget loss, beta 0.95, plain SGD, as in the paper."],
   ["retain_finetune", "Retain-only fine-tune", "Baseline: no forgetting objective, just keeps training on retained clients."],
-  ["federaser", "FedEraser (Wang et al., 2021)", "Published method: replays the recorded training history without the target client, with a few calibration steps on retained clients. Needs per-round updates stored during training."],
+  ["federaser", "FedEraser (Liu et al., 2021)", "Published method: replays the recorded training history without the target client, with a few calibration steps on retained clients. Needs per-round updates stored during training."],
 ];
 
 const pct = (v) => (typeof v === "number" ? `${(v * 100).toFixed(2)}%` : "—");

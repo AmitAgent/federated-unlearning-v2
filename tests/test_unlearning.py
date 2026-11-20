@@ -65,7 +65,7 @@ def test_run_gradient_ascent_rejects_zero_steps():
 
 
 def test_run_gradient_ascent_raises_target_client_loss():
-    """The Phase 08 acceptance criterion, directly: target-client loss
+    """The acceptance criterion, directly: target-client loss
     must measurably rise over the ascent steps.
     """
     torch.manual_seed(0)
@@ -167,7 +167,7 @@ def _accuracy_on(state, dataset, indices):
 
 
 def test_run_knowledge_distillation_recovers_retained_accuracy():
-    """The Phase 09 acceptance criterion: retained-client accuracy recovers
+    """The acceptance criterion: retained-client accuracy recovers
     after distillation.
 
     A single run is not a reliable check: after Gradient Ascent the student
@@ -303,8 +303,8 @@ def test_ga_checkpoint_save_and_load_round_trip(tmp_path, monkeypatch):
 def test_start_unlearning_end_to_end_on_mnist(tmp_path, monkeypatch):
     """Integration test: real partition + real (tiny) FedAvg run, then a
     real Gradient Ascent + Knowledge Distillation pipeline against the
-    saved checkpoint -- mirrors the Phase 08 + Phase 09 acceptance
-    criteria end to end.
+    saved checkpoint -- mirrors the Gradient Ascent and
+    Knowledge Distillation acceptance criteria end to end.
     """
     import core.federated.storage as fl_storage
     import core.partitioning.storage as partition_storage
@@ -422,7 +422,7 @@ def test_start_unlearning_full_pipeline_synthetic(tmp_path, monkeypatch):
     assert status["stage"] == "knowledge_distillation"
     assert status["target_client_id"] == 1
 
-    # Phase 15 (Spec Ch.44): the run records how it was configured and
+    # Spec Ch.44: the run records how it was configured and
     # which code ran it, so the result can be reproduced.
     assert status["method"] == "gradient_ascent+knowledge_distillation"
     assert status["seed"] == 3

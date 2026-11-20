@@ -1,4 +1,4 @@
-"""Demo / Precomputed backend (Phase 14).
+"""Demo / Precomputed backend.
 
 Serves whatever experiments already have artifacts on disk -- no
 compute, no GPU, no network, so it's always available and always the

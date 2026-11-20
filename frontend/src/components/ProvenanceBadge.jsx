@@ -1,5 +1,5 @@
-// Phase 15 -- the single "where did this number come from?" label
-// (Dashboard Spec Ch.46 / Ch.71.13). Before this phase four pages each
+// The single "where did this number come from?" label
+// (Dashboard Spec Ch.46 / Ch.71.13). Previously four pages each
 // carried their own copy of a Measured / Stored chip and other screens
 // had none. Every result screen now uses this one component, so the
 // four kinds mean the same thing everywhere.

@@ -1,4 +1,4 @@
-// Phase 15 -- one fetch helper for the whole dashboard.
+// One fetch helper for the whole dashboard.
 //
 // Every page used to do `fetch(...)`, check `res.ok`, and throw
 // `new Error(body.error)`. That threw away the structured fields the

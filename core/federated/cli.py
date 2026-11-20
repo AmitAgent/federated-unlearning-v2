@@ -1,10 +1,10 @@
-"""CLI entrypoint the Express backend shells out to (Phase 05).
+"""CLI entrypoint the Express backend shells out to.
 
     python -m core.federated.cli --experiment-id demo-1 --model transformer \\
         --rounds 20 --local-epochs 1 --seed 42
 
 Requires that experiment ``demo-1`` already has a partition saved by
-core.partitioning.cli (Phase 03) -- this loads that partition, runs
+core.partitioning.cli -- this loads that partition, runs
 the FedAvg loop against it, persists the full round-by-round history
 to experiments/<experiment-id>/fl_history.json, and prints that same
 history as JSON on stdout for the API layer.
@@ -33,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
         help="Local learning rate (default: 0.01 for transformer/SGD, 0.003 for text_transformer/AdamW)",
     )
     parser.add_argument("--batch-size", type=int, default=32)
-    # Phase 14: optional compute backend selection. Omitted (the
+    # Optional compute backend selection. Omitted (the
     # default) behaves exactly as before this flag existed -- calls
     # run_federated_training directly, no core.compute import at all.
     parser.add_argument(

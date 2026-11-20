@@ -1,4 +1,4 @@
-"""Model releases and the update policy for devices that already installed a model (Phase 16).
+"""Model releases and the update policy for devices that already installed a model.
 
 Unlearning produces a new model on the server. Devices that downloaded the old
 model still hold a copy that contains the forgotten client's influence, and

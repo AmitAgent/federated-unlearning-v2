@@ -1,8 +1,7 @@
-// Shared semantic color code (Dashboard Spec Ch.40, Phase 13 task
-// "Apply a consistent color code for dataset/client/server/model
-// across all pages").
+// Shared semantic color code (Dashboard Spec Ch.40): one consistent color code for
+// dataset/client/server/model across all pages.
 //
-// Before this phase, each component picked its own color per concept
+// Previously each component picked its own color per concept
 // with no shared reference -- most consistently landed on indigo for
 // "server / global model" and rose for "target client" already (see
 // GradientAscentPanel.jsx, ClientInfluenceBars.jsx), but a few spots

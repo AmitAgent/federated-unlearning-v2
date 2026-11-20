@@ -1,4 +1,4 @@
-"""FedAvg aggregation algorithm (Phase 05).
+"""FedAvg aggregation algorithm.
 
 Combines each client's updated model weights into one new global
 model, weighted by how many samples each client trained on -- the

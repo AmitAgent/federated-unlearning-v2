@@ -10,8 +10,7 @@ import ExperimentConfigPanel from "../components/ExperimentConfigPanel.jsx";
 
 // Page 5 -- Global Model & Target Client Selection (Dashboard Spec Ch.11).
 //
-// Both pieces of state this page needs -- the trained fl_history (Phase
-// 05) and the partition's client cards (Phase 04) -- already exist on
+// Both pieces of state this page needs -- the trained fl_history and the partition's client cards -- already exist on
 // disk for this experiment_id by the time someone reaches this page, so
 // it just re-reads them (GET, not POST) rather than re-running anything.
 export default function ClientSelection() {

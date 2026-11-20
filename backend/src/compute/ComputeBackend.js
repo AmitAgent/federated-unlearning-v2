@@ -5,9 +5,9 @@
  * the same high-level operations so the dashboard/visualization layer
  * never has to know which backend is actually running the experiment.
  *
- * Phase 00 scope: interface + stub implementations only.
- * No real ML/training logic belongs here yet (see core/ for that,
- * added in later phases).
+ * These classes are interface stubs behind the /status health check.
+ * The working backends live in core/compute (Python); see
+ * docs/COMPUTE_BACKENDS.md.
  */
 export class ComputeBackend {
   /** @returns {Promise<{name: string, available: boolean}>} */

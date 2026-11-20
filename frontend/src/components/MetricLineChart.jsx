@@ -51,7 +51,7 @@ export default function MetricLineChart({
   const xTicks = niceTicks(1, maxRound, Math.min(Math.max(maxRound, 2), 6)).map((v) => Math.round(v));
   const last = data[data.length - 1];
 
-  // Phase 13 accessibility pass: a real text-equivalent, not just the
+  // Accessibility: a real text-equivalent, not just the
   // chart's title as its accessible name. Describes the trend in
   // words so a screen-reader user gets the same takeaway a sighted
   // user gets from glancing at the line's shape.

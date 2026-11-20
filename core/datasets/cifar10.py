@@ -1,4 +1,4 @@
-"""CIFAR-10 dataset loader (Phase 01)."""
+"""CIFAR-10 dataset loader."""
 from core.datasets.base import Dataset
 
 

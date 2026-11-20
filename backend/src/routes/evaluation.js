@@ -15,9 +15,9 @@ router.param("experimentId", validateExperimentIdParam);
 // client/retained-client accuracy, MIA, and runtime, each measured
 // before and after unlearning, persist to
 // experiments/<id>/evaluation_results.json, and return it
-// (Phase 10: Evaluation Engine -- evaluate_model() from the Dashboard
+// (Evaluation Engine -- evaluate_model() from the Dashboard
 // Spec, Ch.36). Requires that /api/unlearning has already completed
-// for this experiment_id (Phase 10 Depends On Phase 09).
+// for this experiment_id (evaluation depends on unlearning).
 router.post("/", (req, res) => {
   const { experiment_id, non_member_sample_size, device, backend } = req.body || {};
 
@@ -33,8 +33,8 @@ router.post("/", (req, res) => {
     args.push("--non-member-sample-size", String(non_member_sample_size));
   }
   if (device !== undefined) args.push("--device", String(device));
-  // Phase 14: optional compute backend selection, see training.js for
-  // the same pattern -- omitted is byte-for-byte the pre-Phase-14 behavior.
+  // Optional compute backend selection, see training.js for
+  // the same pattern -- omitted is byte-for-byte the previous behavior.
   if (backend !== undefined) args.push("--backend", String(backend));
 
   runEngine({
@@ -49,7 +49,7 @@ router.post("/", (req, res) => {
 // GET /api/evaluation/:experimentId -> re-read the most recently
 // persisted evaluation results without re-running anything.
 //
-// Phase 15 (Spec Ch.43, "Evaluation failure: do not show incomplete
+// (Spec Ch.43, "Evaluation failure: do not show incomplete
 // metrics as valid final results"): a results file whose status is not
 // "complete" is refused with a 409 rather than served as if it were a
 // real result.

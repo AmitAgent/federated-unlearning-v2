@@ -75,7 +75,7 @@ def test_load_fl_history_missing_raises(tmp_path, monkeypatch):
 def test_run_federated_training_converges_on_mnist(tmp_path, monkeypatch):
     """Integration test: real FedAvg loop, real MNIST, real convergence.
 
-    Mirrors the Phase 05 acceptance criterion directly -- a full run on
+    Mirrors the acceptance criterion directly -- a full run on
     MNIST with 5 clients should converge to a reasonable accuracy within
     a couple of rounds, and get_fl_history() should return the same
     well-formed, round-by-round history that was persisted.

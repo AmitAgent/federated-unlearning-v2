@@ -11,14 +11,14 @@ const REPO_ROOT = join(__dirname, "..", "..", "..");
 const EXPERIMENTS_DIR = join(REPO_ROOT, "experiments");
 const MANIFEST_PATH = join(REPO_ROOT, "core", "datasets", "manifest.json");
 
-// Phase 12 -- Experiment Artifact Registry (Dashboard Spec Ch.29/30,
+// Experiment Artifact Registry (Dashboard Spec Ch.29/30,
 // Page 9 "Experiment History" + the Quick Demo's "Model Library").
 //
 // This repo's "machine-readable manifest" (Ch.30) is already
-// distributed across each phase's own artifact files --
-// partition.json (Phase 03), fl_history.json (Phase 05),
-// unlearning_status.json (Phase 08+09), evaluation_results.json
-// (Phase 10), retraining_results.json (Phase 11) -- written by the
+// distributed across each stage's own artifact files --
+// partition.json, fl_history.json,
+// unlearning_status.json, evaluation_results.json
+//, retraining_results.json -- written by the
 // Python core and read back by the other routes. Rather than inventing
 // a second, parallel manifest file that could drift out of sync with
 // those (the Ch.69 "source of truth" rule cuts against duplicating
@@ -27,7 +27,7 @@ const MANIFEST_PATH = join(REPO_ROOT, "core", "datasets", "manifest.json");
 //
 // This is pure read-only aggregation of already-computed JSON -- no
 // training, no evaluation, no new ML logic (explicitly out of scope
-// for this phase) -- so it lives directly in the Express layer rather
+// for this route) -- so it lives directly in the Express layer rather
 // than shelling out to Python, same as the plain-JSON GET handlers in
 // the other route files.
 
@@ -96,7 +96,7 @@ export function summarizeExperiment(experimentId) {
     final_accuracy: flHistory?.final_accuracy ?? null,
     target_client_id: unlearningStatus?.target_client_id ?? evaluationResults?.target_client_id ?? null,
     stages,
-    // Phase 15: true only when the whole research story (Dataset ->
+    // True only when the whole research story (Dataset ->
     // ... -> Retraining Comparison) can be replayed from stored
     // artifacts alone, with no live backend. Professor Demo Mode
     // prefers these experiments.
@@ -133,13 +133,13 @@ router.param("experimentId", validateExperimentIdParam);
 // these regardless of how far each one got.
 //
 // GET /api/experiments?trained_only=true -> only experiments with a
-// usable trained global model (Phase 05 complete) -- the Quick Demo's
+// usable trained global model (training complete) -- the Quick Demo's
 // "AVAILABLE FEDERATED MODELS" library (Ch.27), which starts a user
 // straight at Client Selection without running training themselves.
 router.get("/", (req, res) => {
   const summaries = listExperimentSummaries();
   const trainedOnly = req.query.trained_only === "true";
-  // Phase 15: ?replayable_only=true -> only experiments whose entire
+  // ?replayable_only=true -> only experiments whose entire
   // story can be replayed from stored artifacts (Professor Demo Mode).
   const replayableOnly = req.query.replayable_only === "true";
   let filtered = summaries;
@@ -203,7 +203,7 @@ const METHOD_LABELS = {
   "gradient_ascent+knowledge_distillation": "Gradient Ascent + Knowledge Distillation",
 };
 
-// Phase 15 -- Experiment Reproducibility (Dashboard Spec Ch.44) and the
+// Experiment Reproducibility (Dashboard Spec Ch.44) and the
 // collapsible "Experiment Configuration" panel (Ch.45).
 //
 // Everything here is read straight from the stored artifacts. A field
@@ -212,7 +212,7 @@ const METHOD_LABELS = {
 // made-up configuration shown next to a real result would be exactly
 // the kind of fabricated value Ch.39 forbids. (Unlearning
 // hyperparameters and software version are only present for runs made
-// from Phase 15 onwards.)
+// from the reproducibility update onwards.)
 export function buildReproducibility(experimentId) {
   const dir = join(EXPERIMENTS_DIR, experimentId);
   const partition = readJsonIfExists(join(dir, "partition.json"));

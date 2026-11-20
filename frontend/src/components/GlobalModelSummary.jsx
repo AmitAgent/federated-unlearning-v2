@@ -6,9 +6,9 @@ const MODEL_LABEL = {
   resnet: "ResNet (legacy)",
 };
 
-// Presents the trained global model as a first-class object (Phase 07
+// Presents the trained global model as a first-class object (Dashboard Spec
 // Ch.11): architecture, final accuracy/loss, and the experiment it came
-// from. `history` is the same fl_history shape Phase 06 consumes.
+// from. `history` is the same fl_history shape the FL charts consume.
 export default function GlobalModelSummary({ history }) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">

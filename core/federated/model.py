@@ -1,4 +1,4 @@
-"""Model architectures for the federated learning engine (Phase 05).
+"""Model architectures for the federated learning engine.
 
 Two small transformers, selected by ``model_id``:
 

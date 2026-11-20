@@ -9,8 +9,7 @@ import DemoReplayNote from "../components/DemoReplayNote.jsx";
 import RetrainingComparisonChart from "../components/RetrainingComparisonChart.jsx";
 import RuntimeComparisonChart from "../components/RuntimeComparisonChart.jsx";
 
-// Page 8 -- Retraining Comparison (Dashboard Spec Ch.23-25, Ch.32 Page 8,
-// Phase 11).
+// Page 8 -- Retraining Comparison (Dashboard Spec Ch.23-25, Ch.32 Page 8).
 //
 // Prove unlearning was worth doing: compare the unlearned model against
 // both the original model and a from-scratch retraining baseline that
@@ -18,14 +17,14 @@ import RuntimeComparisonChart from "../components/RuntimeComparisonChart.jsx";
 // expensive (roughly as costly as the original training run) so, per
 // Ch.37, it is run on demand rather than automatically -- this page
 // mirrors Evaluation.jsx's gating + stored-vs-measured pattern, but
-// gates on a *stored evaluation* (Phase 10) rather than re-measuring
+// gates on a *stored evaluation* rather than re-measuring
 // anything itself.
 
 function ProtocolNote({ protocol }) {
   if (!protocol || protocol.hyperparameters_recorded) return null;
   return (
     <p className="mt-1 text-xs text-gray-500">
-      This experiment's original training history predates Phase 11's lr/batch-size recording, so
+      This experiment's original training history predates lr/batch-size recording, so
       the retraining baseline used this project's standing defaults for those two settings.
     </p>
   );
@@ -35,7 +34,7 @@ export default function RetrainingComparison() {
   const { config, refreshStages, appMode } = useExperimentConfig();
   const demo = appMode === "demo";
 
-  // loading | ready | missing -- "ready" means Phase 10's evaluation is stored.
+  // loading | ready | missing -- "ready" means the evaluation is stored.
   const [gateStatus, setGateStatus] = useState("loading");
   // idle | loading | error | ready
   const [runStatus, setRunStatus] = useState("idle");

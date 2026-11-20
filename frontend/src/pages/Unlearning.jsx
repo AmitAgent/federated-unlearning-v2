@@ -14,13 +14,13 @@ import ClientInfluenceBars from "../components/ClientInfluenceBars.jsx";
 
 // Page 6 -- Unlearning (Dashboard Spec Ch.13-20, Ch.32 Page 6).
 //
-// Mirrors Phase 06's replay strategy (see FederatedLearning.jsx): the
-// backend runs both stages -- Gradient Ascent (Phase 08) then
-// Knowledge Distillation (Phase 09) -- synchronously and returns the
+// Mirrors the FL page's replay strategy (see FederatedLearning.jsx): the
+// backend runs both stages -- Gradient Ascent then
+// Knowledge Distillation -- synchronously and returns the
 // complete, real per-step/per-epoch history at once (Ch.37: "prefer
 // live execution" for unlearning). "Live" animation here means
 // revealing that real history progressively, never fabricating values
-// with a timer (Phase 09 acceptance criterion).
+// with a timer (an acceptance criterion).
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -61,7 +61,7 @@ export default function Unlearning() {
   }, [config.experiment_id]);
 
   // If this experiment already has a persisted unlearning result,
-  // load and replay it (a "stored" replay, same as Phase 06's loaded
+  // load and replay it (a "stored" replay, same as the FL page's loaded
   // runs -- never presented as if it were live).
   useEffect(() => {
     if (!config.experiment_id || gateStatus !== "ready") return;

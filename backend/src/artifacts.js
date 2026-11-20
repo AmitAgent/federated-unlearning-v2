@@ -1,6 +1,6 @@
-// Phase 15 -- safe access to experiment artifacts on disk.
+// Safe access to experiment artifacts on disk.
 //
-// Two jobs the per-phase routes each did slightly differently (or not
+// Two jobs the per-stage routes each did slightly differently (or not
 // at all) before:
 //
 //  1. experiment ids are validated before they ever become part of a

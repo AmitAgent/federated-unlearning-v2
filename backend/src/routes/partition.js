@@ -35,7 +35,7 @@ router.param("experimentId", validateExperimentIdParam);
 
 // POST /api/partition -> run core/partitioning (Python) for this config,
 // persist the full partition to experiments/<id>/partition.json, and
-// return the lightweight summary (Phase 03: Partitioning Engine + API).
+// return the lightweight summary (Partitioning Engine + API).
 router.post("/", (req, res) => {
   const { dataset, num_clients, partition_strategy, seed, experiment_id, alpha, real_labels } = req.body || {};
 

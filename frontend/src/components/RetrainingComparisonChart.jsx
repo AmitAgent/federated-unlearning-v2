@@ -22,7 +22,7 @@ export default function RetrainingComparisonChart({ metrics }) {
   const barHeight = 14;
   const barGap = 4;
 
-  // Phase 13 accessibility pass: a real text-equivalent of the three
+  // Accessibility: a real text-equivalent of the three
   // bars per row, not a generic "Comparison chart" label.
   const summaryId = "retraining-comparison-summary";
   const summary = metrics

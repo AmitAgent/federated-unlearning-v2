@@ -5,11 +5,11 @@ import { apiFetch } from "../lib/api.js";
 import ErrorPanel from "../components/ErrorPanel.jsx";
 import ProvenanceBadge from "../components/ProvenanceBadge.jsx";
 
-// Page 9 -- Experiment History (Dashboard Spec Ch.32 Page 9, Phase 12).
+// Page 9 -- Experiment History (Dashboard Spec Ch.32 Page 9).
 //
 // Every experiment that has at least a saved partition, regardless of
-// how far it got, newest first (GET /api/experiments -- the Phase 12
-// registry route aggregates each phase's own stored artifacts, so this
+// how far it got, newest first (GET /api/experiments -- the experiment
+// registry route aggregates each stage's own stored artifacts, so this
 // page never duplicates state the Python core already owns). "Open"
 // loads that experiment's id into the shared config and lands on
 // Client Selection, the same re-entry point the Quick Demo uses --

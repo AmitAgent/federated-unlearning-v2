@@ -1,8 +1,8 @@
-"""Original vs Unlearned vs Retrained comparison (Phase 11, Ch.24-25, Ch.54).
+"""Original vs Unlearned vs Retrained comparison (Ch.24-25, Ch.54).
 
-Pure data: this reads the two stored artifacts -- Phase 10's
+Pure data: this reads the two stored artifacts -- the evaluation's
 ``evaluation_results.json`` (original + unlearned metrics, unlearning
-runtime) and Phase 11's ``retraining_results.json`` (retrained metrics,
+runtime) and the retraining baseline's ``retraining_results.json`` (retrained metrics,
 retraining runtime) -- and lines them up. It never trains or evaluates
 anything, so it is cheap to call and needs no torch.
 
@@ -115,7 +115,7 @@ def compare_with_retraining(experiment_id: str) -> dict:
     retraining_results)`` from the Dashboard Spec (Ch.36), mapped onto
     this repo's stored-artifact layout.
 
-    Raises FileNotFoundError if evaluation (Phase 10) or the retraining
+    Raises FileNotFoundError if evaluation or the retraining
     baseline hasn't been run yet, or ValueError on a target mismatch.
     """
     evaluation = load_evaluation_results(experiment_id)

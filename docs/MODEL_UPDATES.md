@@ -1,4 +1,4 @@
-# Model Updates: unlearning a model that devices already installed (Phase 16)
+# Model Updates: unlearning a model that devices already installed
 
 Unlearning happens on the server. A device that downloaded the old model still has a copy that contains the
 forgotten client's influence, and the server cannot edit that copy. What the server can do is publish the

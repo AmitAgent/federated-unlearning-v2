@@ -15,7 +15,7 @@ import MetricLineChart from "../components/MetricLineChart.jsx";
 //
 // Both training modes (Ch.34's training_mode: "run_federated_training"
 // vs "load_existing") end up with the same shape of data -- an
-// fl_history from Phase 05's get_fl_history() -- and are replayed
+// fl_history from get_fl_history() -- and are replayed
 // through the same client-side round-by-round animation. What differs
 // is only the label: a freshly-run experiment is "Measured", a loaded
 // one is "Stored Experiment" (never presented as if it were live).
@@ -57,7 +57,7 @@ export default function FederatedLearning() {
   const cancelRef = useRef(false);
 
   // Elapsed-time readout while the synchronous /api/training request is in
-  // flight -- Phase 05 returns the whole history at once, so there's no real
+  // flight -- the engine returns the whole history at once, so there's no real
   // per-round progress to show yet; a ticking clock is an honest substitute
   // for a progress bar we can't back with real data.
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -69,7 +69,7 @@ export default function FederatedLearning() {
     return () => clearInterval(id);
   }, [status]);
 
-  // Check whether Phase 04's partitioning already ran for this
+  // Check whether the partitioning already ran for this
   // experiment -- the training CLI requires a saved partition.
   useEffect(() => {
     if (!isLiveMode || !config.experiment_id) {
@@ -90,7 +90,7 @@ export default function FederatedLearning() {
   }, [isLiveMode, config.experiment_id]);
 
   // Client-side round-by-round replay. The backend always returns the
-  // complete history at once (Phase 05 is synchronous), so "live"
+  // complete history at once (the engine is synchronous), so "live"
   // animation here means revealing it progressively rather than
   // streaming it -- true for both a just-measured run and a replayed
   // stored one (Ch.9: "the dashboard should replay the training

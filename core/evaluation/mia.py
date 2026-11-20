@@ -1,4 +1,4 @@
-"""Membership Inference Attack evaluation (Phase 10).
+"""Membership Inference Attack evaluation.
 
 Implements the standard loss-threshold attack (Yeom et al., 2018,
 "Privacy Risk in Machine Learning"): a model tends to have lower loss

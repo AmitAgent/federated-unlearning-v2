@@ -1,4 +1,4 @@
-"""Command-line entry for model releases (Phase 16). Prints one JSON object.
+"""Command-line entry for model releases. Prints one JSON object.
 
 Input mistakes (bad mode, unknown device, nothing to publish yet) are printed
 as {"error": "..."} with exit code 0, so the backend can answer 400 with a

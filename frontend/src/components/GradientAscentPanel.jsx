@@ -3,7 +3,7 @@ import MetricLineChart from "./MetricLineChart.jsx";
 // Gradient Ascent's own live panel (Dashboard Spec Ch.15-16). Every
 // number here comes from a real, already-measured step in the
 // backend's step_history -- `currentStep` only ever points at a step
-// that has actually happened (Phase 08's real values, replayed
+// that has actually happened (Gradient Ascent's real values, replayed
 // progressively rather than streamed -- see Unlearning.jsx).
 function Bar({ label, value, colorClass }) {
   const pct = Math.max(0, Math.min(1, value)) * 100;

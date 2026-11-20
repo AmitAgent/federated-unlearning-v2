@@ -1,4 +1,4 @@
-"""Full-retraining baseline (Phase 11, Dashboard Spec Ch.24).
+"""Full-retraining baseline (Dashboard Spec Ch.24).
 
 The gold-standard answer to "what would the model look like if the
 target client had never participated": run the same FedAvg protocol
@@ -40,7 +40,7 @@ from core.provenance import software_info
 from core.unlearning.storage import load_unlearning_status
 
 #: Optimizer defaults core.federated.cli applies when the caller doesn't
-#: override them. Histories written before Phase 11 didn't record lr /
+#: override them. Histories written before retraining support didn't record lr /
 #: batch_size, and the training API never overrides them, so these are
 #: what those runs actually used.
 LEGACY_LR = 0.01
@@ -50,8 +50,8 @@ LEGACY_BATCH_SIZE = 32
 def run_retraining_baseline(experiment_id: str, device: str = "cpu") -> dict:
     """Retrain from scratch without the unlearning target, evaluate, persist.
 
-    Requires the experiment to have been partitioned, trained (Phase 05),
-    unlearned (Phase 08+09) and evaluated (Phase 10): the target client
+    Requires the experiment to have been partitioned, trained,
+    unlearned and evaluated: the target client
     comes from the completed unlearning run, and the MIA non-member set
     size comes from the stored evaluation, so the retrained model is
     scored on the identical basis as the other two models.
@@ -175,7 +175,7 @@ def run_retraining_baseline(experiment_id: str, device: str = "cpu") -> dict:
             }
             for r in retrain_history["round_history"]
         ],
-        # Phase 15 (Spec Ch.44): which code produced these numbers.
+        # Spec Ch.44: which code produced these numbers.
         "software": software_info(),
         "status": "complete",
     }

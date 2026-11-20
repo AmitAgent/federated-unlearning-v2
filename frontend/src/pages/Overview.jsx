@@ -7,10 +7,10 @@ import { apiFetch } from "../lib/api.js";
 import ErrorPanel from "../components/ErrorPanel.jsx";
 import { ProvenanceLegend } from "../components/ProvenanceBadge.jsx";
 
-// Page 1 -- Overview (Dashboard Spec Ch.1-2, Ch.32 Page 1, Phase 12).
+// Page 1 -- Overview (Dashboard Spec Ch.1-2, Ch.32 Page 1).
 //
 // The landing page's two large choices (Ch.2): a from-scratch
-// "Complete Experiment" (Phases 01-11, starting at Setup) or a "Quick
+// "Complete Experiment" (every stage, starting at Setup) or a "Quick
 // Demo" that skips straight to Client Selection using an
 // already-trained model from the library (Ch.27-28). Both paths reuse
 // the exact same downstream pages -- this page only decides which

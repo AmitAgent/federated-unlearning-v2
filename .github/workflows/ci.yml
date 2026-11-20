@@ -40,8 +40,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      # Phase 05 (federated learning engine) needs torch/torchvision for
-      # real local training + a real MNIST run; core.partitioning
-      # (Phase 03) never needed them since it never loads real image data.
+      # The federated learning engine needs torch/torchvision for real local
+      # training + a real MNIST run; core.partitioning never needed them
+      # since it never loads real image data.
       - run: pip install -r core/requirements.txt
       - run: pytest tests/ -q -m "not slow"

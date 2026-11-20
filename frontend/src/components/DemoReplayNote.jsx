@@ -1,4 +1,4 @@
-// Phase 15 -- shown in Professor Demo Mode in place of a "Run ..."
+// Shown in Professor Demo Mode in place of a "Run ..."
 // button. Demo Mode only replays stored results; it never starts a
 // computation (Spec Ch.37), and re-running a stage would also overwrite
 // the stored artifact the rest of the demo depends on.

@@ -1,4 +1,4 @@
-"""Zip helpers for moving one experiment folder between machines (Phase 14b).
+"""Zip helpers for moving one experiment folder between machines.
 
 A remote compute server (College GPU / Colab) runs core/ against ITS OWN
 ``experiments/<id>/`` folder. To make that work the Mac sends the folder up

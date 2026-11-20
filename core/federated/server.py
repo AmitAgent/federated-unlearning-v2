@@ -1,9 +1,9 @@
-"""Federated learning server / aggregation loop (Phase 05).
+"""Federated learning server / aggregation loop.
 
 Drives the FedAvg round loop: each round, every client trains locally
 on its partition shard (client.py), the server aggregates their
 updates (fedavg.py), and the new global model is evaluated on the
-held-out test set. The per-round results are what Phase 06's charts
+held-out test set. The per-round results are what the dashboard's charts
 and progress UI consume, and what get_fl_history() returns.
 """
 from __future__ import annotations
@@ -62,7 +62,7 @@ def fedavg_train(
     `partition` is a full partition dict from core.partitioning (with
     per-client sample indices). Returns ``(history, final_state_dict)``.
 
-    Split out of `run_federated_training` in Phase 11 so the full-
+    Split out of `run_federated_training` for retraining so the full-
     retraining baseline can run the exact same loop against a
     partition with the target client removed, without overwriting the
     original experiment's ``fl_history.json``/``global_model.pt``.
@@ -176,7 +176,7 @@ def fedavg_train(
         "rounds": rounds,
         "local_epochs": local_epochs,
         "seed": seed,
-        # Phase 11 addendum: record the optimizer hyperparameters too, so
+        # Retraining addendum: record the optimizer hyperparameters too, so
         # the retraining baseline can reproduce this run's protocol
         # exactly instead of assuming the defaults.
         "lr": lr,
@@ -222,7 +222,7 @@ def run_federated_training(
 
     meta = load_manifest()[partition["dataset"]]
     save_fl_history(experiment_id, history)
-    # Phase 08 addendum: persist the trained weights too, not just the
+    # Unlearning addendum: persist the trained weights too, not just the
     # round-by-round metrics -- the Gradient Ascent stage needs the
     # actual global model, not just its accuracy/loss history.
     save_model_checkpoint(

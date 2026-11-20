@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../lib/api.js";
 
-// Phase 15 -- the collapsible "Experiment Configuration" panel that
+// The collapsible "Experiment Configuration" panel that
 // every result screen carries (Dashboard Spec Ch.44 / Ch.45), so any
 // number on screen can be traced back to the exact dataset, partition,
 // seed, model and unlearning settings that produced it.

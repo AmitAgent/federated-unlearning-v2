@@ -1,8 +1,8 @@
-"""Persistence for computed partitions (Phase 03).
+"""Persistence for computed partitions.
 
 Partitions are written to ``experiments/<experiment_id>/partition.json``
 at the repo root -- the same ``experiments/`` directory DemoBackend
-(Phase 00/14) is planned to read precomputed artifacts from.
+ is planned to read precomputed artifacts from.
 """
 from __future__ import annotations
 

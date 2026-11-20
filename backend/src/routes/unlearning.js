@@ -9,13 +9,13 @@ router.param("experimentId", validateExperimentIdParam);
 // POST /api/unlearning -> run core/unlearning (Python) Gradient Ascent
 // followed by Knowledge Distillation for this experiment/target
 // client, persist the status to experiments/<id>/unlearning_status.json,
-// and return it (Phase 08 + Phase 09: Unlearning Engine -- Gradient
+// and return it (Unlearning Engine -- Gradient
 // Ascent + Knowledge Distillation + API). This is
 // start_unlearning(client_id) from the Dashboard Spec (Ch.71.8).
 // Requires that /api/partition and /api/training have already been
 // run for this experiment_id.
 //
-// Phase 15: a failure reports WHICH stage failed ("Gradient Ascent" or
+// A failure reports WHICH stage failed ("Gradient Ascent" or
 // "Knowledge Distillation") using what the engine persisted, plus the
 // technical error and a retry hint (Dashboard Spec Ch.43).
 router.post("/", (req, res) => {
@@ -56,8 +56,8 @@ router.post("/", (req, res) => {
   if (kd_temperature !== undefined) args.push("--kd-temperature", String(kd_temperature));
   if (kd_alpha !== undefined) args.push("--kd-alpha", String(kd_alpha));
   if (kd_batch_size !== undefined) args.push("--kd-batch-size", String(kd_batch_size));
-  // Phase 14: optional compute backend selection, see training.js for
-  // the same pattern -- omitted is byte-for-byte the pre-Phase-14 behavior.
+  // Optional compute backend selection, see training.js for
+  // the same pattern -- omitted is byte-for-byte the previous behavior.
   if (backend !== undefined) args.push("--backend", String(backend));
 
   runEngine({

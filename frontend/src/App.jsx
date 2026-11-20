@@ -37,7 +37,7 @@ const ROUTES = [
 // -- the same single source of truth PipelineMiniMap reads, so the
 // sidebar and the mini-map can never disagree about what's finished.
 // This *is* "the persistent navigation stepper reflecting the 9-page
-// order" (Phase 13): grouped, in spec order, with per-page progress.
+// order": grouped, in spec order, with per-page progress.
 function navSections(stages, config, appMode) {
   const sections = [
     {
@@ -75,7 +75,7 @@ function navSections(stages, config, appMode) {
     },
   ];
 
-  // Phase 15: Professor Demo Mode keeps the interface simple (Spec
+  // Professor Demo Mode keeps the interface simple (Spec
   // Ch.37) -- the setup and history pages are for building experiments,
   // not for presenting one.
   if (appMode === "demo") {

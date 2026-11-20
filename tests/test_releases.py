@@ -1,4 +1,4 @@
-"""Phase 16: model releases and the auto / request-then-force update policy.
+"""Model releases and the auto / request-then-force update policy.
 
 Pure standard-library logic, so no torch. The clock is controlled by passing
 `now` and by the simulated-clock offset the module stores.

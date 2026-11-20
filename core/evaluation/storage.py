@@ -1,4 +1,4 @@
-"""Persistence for evaluation results (Phase 10).
+"""Persistence for evaluation results.
 
 Mirrors core/unlearning/storage.py: results are written to
 ``experiments/<experiment_id>/evaluation_results.json``, alongside
@@ -37,7 +37,7 @@ def load_evaluation_results(experiment_id: str) -> dict:
     return json.loads(path.read_text())
 
 
-# -- Full-retraining baseline (Phase 11) ----------------------------------
+# -- Full-retraining baseline ----------------------------------
 #
 # The retraining baseline is a *separate run* from the unlearning
 # pipeline (Ch.24) -- its own weights and its own results file, stored

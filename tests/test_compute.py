@@ -1,4 +1,4 @@
-"""Phase 14 tests: the backend-neutral compute API, the four backends,
+"""The backend-neutral compute API, the four backends,
 the Auto fallback chain, and the "no credentials leak" security review.
 
 RemoteHttpBackend is exercised against a real local http.server on
@@ -351,13 +351,13 @@ def test_compute_cli_status_prints_valid_json(capsys):
     assert [t["backend"] for t in payload["auto_trace"]] == ["college_gpu", "colab", "local"]
 
 
-# -- --backend wiring in the existing per-phase CLIs -------------------------
+# -- --backend wiring in the existing per-stage CLIs -------------------------
 #
 # These confirm the *dispatch*: given --backend, each CLI resolves a
 # backend and calls the right method with the right kwargs, and prints
 # the {<payload>, "backend_trace": [...]} shape instead of the bare
 # payload. They use a fake backend double (not a real torch run) since
-# the underlying ML correctness is already covered by each phase's own
+# the underlying ML correctness is already covered by each stage's own
 # tests -- this file only needs to prove the new wiring is correct.
 
 

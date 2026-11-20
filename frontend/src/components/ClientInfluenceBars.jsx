@@ -1,7 +1,7 @@
 // "Client Influence" before/after bars (Dashboard Spec Ch.19). Values
 // are always real measured accuracy -- retained-client accuracy from
-// Phase 09's Knowledge Distillation (before/after distillation), and
-// the target client's accuracy from Phase 08's Gradient Ascent
+// Knowledge Distillation (before/after distillation), and
+// the target client's accuracy from Gradient Ascent
 // (before ascent / after ascent) shown alongside for the "one client's
 // influence drops while the others are preserved" contrast the spec
 // asks for. No influence score is invented -- these are the actual

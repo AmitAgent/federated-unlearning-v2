@@ -1,10 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 // Central experiment state (Dashboard Spec Ch.34).
-// Every later phase (partitioning, training, unlearning, evaluation)
+// Every stage (partitioning, training, unlearning, evaluation)
 // reads/extends this instead of keeping its own copy.
 const DEFAULT_CONFIG = {
-  dataset: null, // dataset id, e.g. "cifar10" -- set from the Phase 01 picker
+  dataset: null, // dataset id, e.g. "cifar10" -- set from the picker
   num_clients: 10, // free numeric input -- never a fixed set of options (Ch.4)
   partition_strategy: "non_iid", // "iid" | "non_iid"
   dataset_modality: "image", // "image" | "text" -- set with the dataset; decides which models are offered
@@ -13,8 +13,8 @@ const DEFAULT_CONFIG = {
   local_epochs: 1,
   seed: 42,
   training_mode: "load_existing", // "load_existing" | "run_federated_training"
-  target_client_id: null, // set on Phase 07's Client Selection page -- the client to unlearn
-  // Phase 14: which compute backend runs training/unlearning/evaluation.
+  target_client_id: null, // set on the Client Selection page -- the client to unlearn
+  // Which compute backend runs training/unlearning/evaluation.
   // "auto" walks College GPU -> Colab -> Local -> Demo; a specific kind
   // pins that backend and fails loudly if it's unavailable. This is a
   // UI preference only -- no credential or endpoint ever lives here.
@@ -33,7 +33,7 @@ function generateExperimentId() {
   return `exp-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-// Phase 15: "research" is the full lab (can train, run, tweak);
+// "research" is the full lab (can train, run, tweak);
 // "demo" is Professor Demo Mode -- replays a stored experiment and
 // never starts a long computation (Dashboard Spec Ch.37 / Ch.71.12).
 // Kept in sessionStorage so a page reload mid-presentation does not
@@ -59,8 +59,8 @@ export function ExperimentProvider({ children }) {
     experiment_id: generateExperimentId(),
   }));
 
-  // Phase 13: how far the *current* experiment_id has actually gotten,
-  // read from the Phase 12 registry (GET /api/experiments/:id) rather
+  // How far the *current* experiment_id has actually gotten,
+  // read from the registry (GET /api/experiments/:id) rather
   // than re-derived separately by the nav stepper and the pipeline
   // mini-map -- both read this one value, so they can never disagree
   // about what stage the experiment is at ("consolidate page state
@@ -134,7 +134,7 @@ export function ExperimentProvider({ children }) {
     });
   }
 
-  // Phase 12: point this context at an already-persisted experiment
+  // Point this context at an already-persisted experiment
   // (from the Model Library or Experiment History) instead of the
   // fresh draft one started with. Used by both entry points so a
   // stored experiment is loaded identically either way -- every

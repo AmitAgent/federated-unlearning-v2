@@ -1,6 +1,6 @@
-"""Federated learning client logic (Phase 05).
+"""Federated learning client logic.
 
-One client = one shard of the training set (from Phase 03's
+One client = one shard of the training set (from the partitioning
 partition) plus a local copy of the current global model. Each round,
 a client trains that local copy for a few epochs and reports back its
 updated weights and how many samples it trained on -- the latter is

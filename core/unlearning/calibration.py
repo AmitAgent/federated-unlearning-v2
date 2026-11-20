@@ -1,4 +1,4 @@
-"""Calibrated forgetting (opt-in extension to Phase 08).
+"""Calibrated forgetting (opt-in extension to Gradient Ascent).
 
 Plain Gradient Ascent has no notion of "enough": it keeps raising the
 target client's loss until a step budget runs out. That over-forgets --
@@ -38,7 +38,7 @@ class CalibrationConfig:
 
     reference_*: held-out samples the model never trained on, used as
         the "unseen data" yardstick. Must NOT overlap the samples the
-        Phase 10 evaluation uses as MIA non-members.
+        The evaluation uses as MIA non-members.
     guard_*: retained-client training samples used to watch collateral
         damage during ascent (optional; leave indices empty to disable).
     ks_target: stop once KS distance falls to or below this value.

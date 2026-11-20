@@ -1,4 +1,4 @@
-"""MNIST dataset loader (Phase 01)."""
+"""MNIST dataset loader."""
 from core.datasets.base import Dataset
 
 

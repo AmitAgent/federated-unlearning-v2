@@ -20,7 +20,7 @@ export default function ClientCard({ client, strategy, selectable, selected, onS
   // the shared target color (rose), not a generic selection color, to
   // stay consistent with how the target client is highlighted
   // everywhere else (ClientInfluenceBars, GradientAscentPanel) --
-  // Phase 13's "target-client highlighting" task.
+  // the shared target-client highlighting.
   const interactionProps = selectable
     ? {
         role: "button",

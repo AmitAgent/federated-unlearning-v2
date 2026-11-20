@@ -1,7 +1,7 @@
 // Class distribution heatmap (Dashboard Spec Ch.7.2). Columns beyond
 // this width are grouped into labeled blocks with a scrollable
 // container, which is what keeps a 100-class dataset like CIFAR-100
-// readable (Phase 04 "grouping/scroll" requirement).
+// readable (the "grouping/scroll" requirement).
 const GROUP_SIZE = 10;
 
 function cellColor(count, maxCount) {
@@ -19,7 +19,7 @@ export default function DistributionHeatmap({ partition }) {
   );
   const grouped = num_classes > GROUP_SIZE;
 
-  // Phase 13 accessibility pass: the heatmap encodes sample count as
+  // Accessibility: the heatmap encodes sample count as
   // cell color alone, which is invisible to a screen reader and
   // unreliable for colorblind users. Each cell gets its count as real
   // (visually hidden) text, and the client with the fewest distinct

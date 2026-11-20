@@ -2,7 +2,7 @@ import ClientCard from "./ClientCard.jsx";
 
 // Renders one card per client (Dashboard Spec Ch.7.1). Uses an
 // auto-filling grid so this reads correctly whether there are 5, 10,
-// or 20 clients (Phase 04 acceptance criteria).
+// or 20 clients (the client distribution acceptance criteria).
 export default function ClientCardGrid({ partition, selectable, selectedClientId, onSelect, heading = "Client Cards" }) {
   return (
     <section aria-labelledby="client-cards-heading">

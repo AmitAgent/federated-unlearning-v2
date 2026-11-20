@@ -33,7 +33,7 @@ app.use("/api/compute", computeRouter);
 app.use("/api/releases", releasesRouter);
 app.use("/api/mode-comparison", modeComparisonRouter);
 
-// Health-check route (Phase 00 deliverable).
+// Health-check route.
 app.get("/status", async (_req, res) => {
   const backendStatus = await backend.getStatus();
   res.status(200).json({
@@ -43,7 +43,7 @@ app.get("/status", async (_req, res) => {
   });
 });
 
-// Phase 15: every failure answers in JSON, never Express's default HTML
+// Every failure answers in JSON, never Express's default HTML
 // error page -- the dashboard parses a response body on every failed
 // request and a stray HTML page used to surface as "Unexpected token <".
 app.use("/api", (_req, res) => {

@@ -2,7 +2,7 @@
 
 Ported unchanged in structure from the first project
 (``src/unlearning/federaser.py``, ``FedEraserEngine.run_federaser``), which
-implements Wang et al., "FedEraser: Enabling Efficient Client-Level Data
+implements Liu et al., "FedEraser: Enabling Efficient Client-Level Data
 Removal from Federated Learning Models", IEEE/ACM IWQoS 2021.
 
 How it works

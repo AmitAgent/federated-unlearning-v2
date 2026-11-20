@@ -6,7 +6,7 @@
 
 Exit code is 0 only if no experiment has a failed check, so this can
 gate a release or a "ready to present" step. Warnings (e.g. a run made
-before Phase 15 that has no recorded unlearning hyperparameters) do not
+before unlearning settings were recorded that has no recorded unlearning hyperparameters) do not
 fail the run.
 
 Needs no torch, no GPU and no network: it only reads the JSON artifacts.

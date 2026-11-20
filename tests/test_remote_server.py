@@ -1,4 +1,4 @@
-"""Phase 14b: the remote compute server + the client's long-job / sync behaviour.
+"""The remote compute server + the client's long-job / sync behaviour.
 
 Uses a stub backend, so no torch and no GPU: this tests the HTTP protocol,
 auth, locking, keep-alive streaming, error mapping and folder sync.

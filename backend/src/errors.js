@@ -1,7 +1,7 @@
-// Phase 15 -- one place that turns "a Python engine failed" into a
+// One place that turns "a Python engine failed" into a
 // structured, presentation-safe API error (Dashboard Spec Ch.43).
 //
-// Before this phase every route answered a failure with
+// Previously every route answered a failure with
 // `{ error: "Training failed", detail: <raw stderr> }` -- the whole
 // Python traceback, file paths and all. That is hard to read on a
 // projector and leaks server paths to the browser. Now every failure

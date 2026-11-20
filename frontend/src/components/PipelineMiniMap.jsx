@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 
-// Persistent pipeline mini-map (Dashboard Spec Ch.41, Phase 13).
+// Persistent pipeline mini-map (Dashboard Spec Ch.41).
 //
 // "The main overview should contain a persistent pipeline... The
 // current stage should be highlighted. Completed stages should show a
@@ -9,8 +9,8 @@ import { Link, useLocation } from "react-router-dom";
 // Overview, so it's always visible regardless of which of the 9 pages
 // someone is on.
 //
-// Completion comes from ExperimentContext's `stages` (Phase 13's
-// single central source, read from the Phase 12 registry) plus
+// Completion comes from ExperimentContext's `stages` (the
+// single central source, read from the registry) plus
 // `config.target_client_id` for the one stage that isn't a stored
 // artifact. "Current" comes from the active route. Each chip is a
 // real link, so this doubles as quick navigation, not just a status

@@ -51,7 +51,7 @@ from core.unlearning.federaser import (
 from core.unlearning.storage import EXPERIMENTS_DIR, load_unlearning_status
 
 LOG_NAME = "fl_round_log.pt"
-KIND = "FedEraser (Wang et al., IWQoS 2021) - needs recorded round history"
+KIND = "FedEraser (Liu et al., IWQoS 2021) - needs recorded round history"
 
 
 def _gap(a: float, b: float) -> float:

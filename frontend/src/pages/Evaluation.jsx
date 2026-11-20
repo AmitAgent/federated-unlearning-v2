@@ -9,10 +9,10 @@ import DemoReplayNote from "../components/DemoReplayNote.jsx";
 import BackendTraceNote from "../components/BackendTraceNote.jsx";
 import EvaluationMetrics from "../components/EvaluationMetrics.jsx";
 
-// Page 7 -- Evaluation (Dashboard Spec Ch.21-22, Ch.32 Page 7, Phase 10).
+// Page 7 -- Evaluation (Dashboard Spec Ch.21-22, Ch.32 Page 7).
 //
 // Mirrors Unlearning.jsx's gating + stored-vs-measured pattern: a
-// completed unlearning run (Phase 08+09) is required before evaluation
+// completed unlearning run is required before evaluation
 // can run at all, and a previously persisted result is loaded and
 // shown as "Stored Experiment" rather than silently re-running the
 // (real, non-trivial) accuracy/MIA computation on every page visit.

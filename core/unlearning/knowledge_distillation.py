@@ -1,6 +1,6 @@
-"""Knowledge Distillation unlearning step (Phase 09).
+"""Knowledge Distillation unlearning step.
 
-The repair stage: Gradient Ascent (Phase 08) deliberately damages the
+The repair stage: Gradient Ascent deliberately damages the
 whole model to forget the target client, but it has no way to damage
 *only* the target client's influence -- the rest of the model's
 accuracy on every other ("retained") client suffers too. This stage
@@ -80,10 +80,10 @@ def run_knowledge_distillation(
     """Distill `teacher_state` (pre-ascent model) into `student_state`
     (post-ascent model), training only on `retained_clients`' data.
 
-    `retained_clients` is a list of partition client dicts (Phase 03's
-    shape: ``{"client_id": int, "indices": [...]}``) -- every client
+    `retained_clients` is a list of partition client dicts (the
+    partition shape: ``{"client_id": int, "indices": [...]}``) -- every client
     *except* the one Gradient Ascent targeted. Per-client accuracy is
-    measured before and after distillation (Phase 09's acceptance
+    measured before and after distillation (the acceptance
     criterion: "Retained-client accuracy recovers measurably after
     distillation"), alongside a per-epoch KD-loss/accuracy history for
     the live animation.

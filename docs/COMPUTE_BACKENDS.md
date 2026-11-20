@@ -1,4 +1,4 @@
-# Compute Backends (Phase 14)
+# Compute Backends
 
 One interface (`core/compute/base.py::ComputeBackend`), four backends, one fallback chain.
 
@@ -12,7 +12,7 @@ One interface (`core/compute/base.py::ComputeBackend`), four backends, one fallb
 ## Selecting a backend
 
 The UI stores `compute_backend` (`auto` by default) and sends it as `backend` on the training, unlearning, and
-evaluation POSTs. Omitting `backend` entirely preserves pre-Phase-14 behavior (in-process, no `core.compute` import).
+evaluation POSTs. Omitting `backend` entirely preserves previous behavior (in-process, no `core.compute` import).
 
 * **Auto** walks `college_gpu -> colab -> local -> demo` and uses the first backend whose health check passes.
 * **A pinned backend never falls back.** If it is unavailable the run fails with that backend's reason. Silently
@@ -56,6 +56,6 @@ Default timeout is 2 seconds so an unreachable host can't stall the status panel
 
 ## Not covered
 
-* Retraining-baseline execution (Phase 11) is not routed through compute backends; it still runs in-process.
+* Retraining-baseline execution is not routed through compute backends; it still runs in-process.
 * The remote server (`core/compute/server.py`, see [`REMOTE_COMPUTE_SETUP.md`](./REMOTE_COMPUTE_SETUP.md)) is tested
   over real HTTP with a stub backend. It has not been run on an actual college GPU or Colab session by the test suite.

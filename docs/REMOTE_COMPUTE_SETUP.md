@@ -1,4 +1,4 @@
-# Connecting the College GPU and Google Colab (Phase 14b)
+# Connecting the College GPU and Google Colab
 
 Both backends are the same program: `python -m core.compute.server`, started on the remote machine and
 reached from your Mac over HTTP. Only the way you reach it differs.
@@ -10,7 +10,7 @@ reached from your Mac over HTTP. Only the way you reach it differs.
 4. When it finishes, the server's `experiments/<id>/` is downloaded back, so the UI and the acceptance checker
    see the new files locally. (Disable with `REMOTE_SYNC=0` only if the folder is already shared.)
 
-Retraining (Phase 11) is **not** routed through compute backends yet; it still runs on your Mac.
+Retraining is **not** routed through compute backends yet; it still runs on your Mac.
 
 ## A. Google Colab
 1. Open `colab/remote_compute_server.ipynb` in Colab (File > Open notebook > GitHub, paste the repo URL).

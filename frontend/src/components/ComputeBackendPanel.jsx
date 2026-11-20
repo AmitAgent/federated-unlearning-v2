@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useExperimentConfig } from "../state/ExperimentContext.jsx";
 
-// Compute Backend selector + status panel (Phase 14, Dashboard Spec
+// Compute Backend selector + status panel (Dashboard Spec
 // Ch.71 / Ch.72). Shows every backend's live status, lets the user
 // pick Auto or pin one, and -- in Auto mode -- shows exactly which
 // backend it would pick right now and why the ones above it were

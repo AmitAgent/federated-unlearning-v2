@@ -1,12 +1,12 @@
-"""Persistence for federated training history (Phase 05).
+"""Persistence for federated training history.
 
 Mirrors core/partitioning/storage.py: history is written to
 ``experiments/<experiment_id>/fl_history.json`` alongside that
 experiment's ``partition.json``.
 
-Addendum (Phase 08): ``run_federated_training`` produced round-by-round
+Addendum: ``run_federated_training`` produced round-by-round
 *metrics* (accuracy/loss) but never persisted the trained global
-model's *weights* anywhere -- fine for Phase 06's charts and Phase 07's
+model's *weights* anywhere -- fine for the training charts and the
 summary card, both of which only read ``fl_history.json``, but the
 Gradient Ascent stage needs to actually load the trained model to run
 ascent steps against it. ``save_model_checkpoint``/``load_model_checkpoint``

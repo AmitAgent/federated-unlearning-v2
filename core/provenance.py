@@ -1,8 +1,7 @@
-"""Reproducibility metadata (Phase 15, Dashboard Spec Ch.44).
+"""Reproducibility metadata (Dashboard Spec Ch.44).
 
 Spec Ch.44 asks every experiment to store, among other things, its
-"Software/config version" and "Unlearning hyperparameters". Until this
-phase the artifacts recorded the dataset, partition, seed, FL protocol
+"Software/config version" and "Unlearning hyperparameters". At first the artifacts recorded the dataset, partition, seed, FL protocol
 and metrics -- but not which code produced them or which unlearning
 hyperparameters were used, so a result could not be reproduced exactly.
 

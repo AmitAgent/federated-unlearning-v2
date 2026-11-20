@@ -1,4 +1,4 @@
-"""Generic HTTP-based remote compute backend (Phase 14).
+"""Generic HTTP-based remote compute backend.
 
 College GPU and Google Colab share one implementation: both are "some
 machine running this project's core/ code, reachable over HTTP,
@@ -8,7 +8,7 @@ base URL and (optional) API key -- so both are just differently
 -configured instances of this one class rather than two near-duplicate
 files.
 
-Security (Phase 14's "no credentials in the frontend" review):
+Security ("no credentials in the frontend" review):
   * The base URL and API key are read from environment variables by
     *name* at call time, never passed in as literal values and never
     cached on the instance -- nothing credential-shaped is ever held

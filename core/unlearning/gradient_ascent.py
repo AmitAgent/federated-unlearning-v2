@@ -1,19 +1,18 @@
-"""Gradient Ascent unlearning step (Phase 08).
+"""Gradient Ascent unlearning step.
 
 The forgetting stage: instead of the usual training direction (descend
 the loss on a client's data so the model gets *better* at it), we
 ascend the loss on the target client's data so the model gets
 deliberately *worse* at it -- pushing it to unlearn whatever it picked
-up from that client during FedAvg (Phase 05).
+up from that client during FedAvg.
 
 Implemented the standard way this is done in practice: minimize the
 *negated* cross-entropy loss with an ordinary SGD optimizer. Minimizing
 ``-loss`` is exactly gradient ascent on ``loss``, so this reuses
 `torch.optim.SGD` instead of hand-rolling a parameter update rule.
 
-Only the ascent stage lives here (Phase 08 scope). Knowledge
-Distillation, which repairs the rest of the model afterwards, is
-Phase 09.
+Only the ascent stage lives here (see
+knowledge_distillation.py for the repair stage that follows).
 """
 from __future__ import annotations
 
@@ -34,7 +33,7 @@ from core.unlearning.calibration import (
 #: parameter. Gradient ascent has no natural convergence point (unlike
 #: descent, it diverges by design), so unclipped gradients can blow the
 #: target client's loss up so fast that the rest of the model's
-#: weights are no longer recoverable for Phase 09's distillation step.
+#: weights are no longer recoverable for the distillation step.
 #: This keeps ascent controlled instead of destructive.
 DEFAULT_GRAD_CLIP_NORM = 5.0
 
@@ -87,7 +86,7 @@ def run_gradient_ascent(
 
     Returns a dict with the resulting state dict and the full
     per-step history, so callers can both use the new weights (feed
-    them into Phase 09's Knowledge Distillation) and show the live
+    them into Knowledge Distillation) and show the live
     chart the spec calls for.
 
     If `calibration` is given, ascent is stopped by calibrated rules

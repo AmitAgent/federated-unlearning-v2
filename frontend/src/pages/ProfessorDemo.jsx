@@ -6,7 +6,7 @@ import ProvenanceBadge from "../components/ProvenanceBadge.jsx";
 import { DEMO_STEPS } from "../components/DemoGuideBar.jsx";
 import { useExperimentConfig } from "../state/ExperimentContext.jsx";
 
-// Phase 15 -- Professor Demo Mode launcher (Dashboard Spec Ch.37).
+// Professor Demo Mode launcher (Dashboard Spec Ch.37).
 //
 // Rules this page enforces:
 //  * it only offers experiments whose ENTIRE story is stored

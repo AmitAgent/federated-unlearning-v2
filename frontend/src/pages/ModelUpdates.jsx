@@ -4,7 +4,7 @@ import { apiFetch } from "../lib/api.js";
 import ErrorPanel from "../components/ErrorPanel.jsx";
 import ProvenanceBadge from "../components/ProvenanceBadge.jsx";
 
-// Phase 16 -- Model Updates.
+// Model Updates.
 //
 // After unlearning, devices that already installed the old model still hold
 // a copy that contains the forgotten client's influence. This page publishes

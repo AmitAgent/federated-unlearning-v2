@@ -1,4 +1,4 @@
-"""Orchestrates the unlearning pipeline (Phase 08 + Phase 09).
+"""Orchestrates the unlearning pipeline.
 
 Exposes the two conceptual ComputeBackend operations from the
 Dashboard Spec (Ch.71.8):
@@ -8,14 +8,14 @@ Dashboard Spec (Ch.71.8):
 
 `start_unlearning` runs both stages of the pipeline in sequence:
 
-    1. Gradient Ascent (Phase 08)   -- forget the target client
-    2. Knowledge Distillation (Phase 09) -- repair collateral damage
+    1. Gradient Ascent   -- forget the target client
+    2. Knowledge Distillation -- repair collateral damage
        on every other ("retained") client, using the pre-ascent
        global model as the teacher
 
 and persists the resulting status (and both stages' weights) so a
 later `get_unlearning_status` call can pick the full result back up
-without re-running anything. Evaluation/MIA (Phase 10) is out of
+without re-running anything. Evaluation/MIA is out of
 scope here -- this pipeline stops once the final unlearned model is
 saved.
 """
@@ -38,7 +38,7 @@ from core.unlearning.storage import (
 )
 
 
-#: The Phase 10 evaluation uses test indices [0, 200) as MIA non-members.
+#: The evaluation uses test indices [0, 200) as MIA non-members.
 #: Calibration reference samples start well past that so the yardstick
 #: used to *control* unlearning is never the data used to *score* it.
 CALIBRATION_REFERENCE_OFFSET = 1000
@@ -128,8 +128,8 @@ def start_unlearning(
     """Run the full Gradient Ascent -> Knowledge Distillation pipeline
     against `client_id`'s local data.
 
-    Requires that this experiment has already been through Phase 03
-    (partitioned) and Phase 05 (trained, with a saved checkpoint).
+    Requires that this experiment has already been through partitioning
+    and federated training (trained, with a saved checkpoint).
     """
     started_at = time.time()
 
@@ -204,7 +204,7 @@ def start_unlearning(
         )
 
     # The pre-ascent global model is Knowledge Distillation's teacher
-    # (Phase 09's goal): capture it now, before Gradient Ascent
+    # (the goal of distillation): capture it now, before Gradient Ascent
     # overwrites the working weights below.
     pretrained_state = checkpoint["state_dict"]
     # Consistent "Before" snapshot: the original global model on all clients.
@@ -217,7 +217,7 @@ def start_unlearning(
         "dataset": history["dataset"],
         "stage": "gradient_ascent",
         "status": "running",
-        # Phase 15 (Spec Ch.44): record exactly how this run was
+        # Spec Ch.44: record exactly how this run was
         # configured and which code ran it, so the result can be
         # reproduced. Written up front so even a failed run keeps it.
         "method": "gradient_ascent+knowledge_distillation",
@@ -248,7 +248,7 @@ def start_unlearning(
         status["hyperparameters"]["adaptive"] = adaptive_plan
     save_unlearning_status(experiment_id, status)
 
-    # -- Stage 1: Gradient Ascent (Phase 08) --------------------------
+    # -- Stage 1: Gradient Ascent --------------------------
     ga_started_at = time.time()
     try:
         ga_result = run_gradient_ascent(
@@ -308,7 +308,7 @@ def start_unlearning(
     }
     save_unlearning_status(experiment_id, status)
 
-    # -- Stage 2: Knowledge Distillation (Phase 09) -------------------
+    # -- Stage 2: Knowledge Distillation -------------------
     kd_started_at = time.time()
     try:
         kd_result = run_knowledge_distillation(

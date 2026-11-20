@@ -1,13 +1,13 @@
-"""Local Mac / CPU / CUDA backend (Phase 14).
+"""Local Mac / CPU / CUDA backend.
 
 Runs every operation in-process by calling the exact same functions
-the existing per-phase CLIs already call (core.federated.server,
+the existing per-stage CLIs already call (core.federated.server,
 core.unlearning.unlearning_engine, core.evaluation.evaluation_engine)
 -- this backend is not a reimplementation, it's the same code behind
 the shared interface. A run routed through LocalBackend therefore
 produces byte-for-byte the same artifacts as calling those functions
 directly, which is what every existing Express route has done since
-Phase 05.
+the federated learning engine was added.
 
 Device auto-detection (CUDA -> MPS -> CPU) happens once per process,
 matching the "Local Mac backend with CUDA/MPS/CPU auto-detection" task
@@ -104,7 +104,7 @@ class LocalBackend(ComputeBackend):
 
     # Not part of the shared ComputeBackend contract (evaluation and
     # retraining aren't in the Dashboard Spec's Ch.71 list, which predates
-    # those phases) but every backend that can start_unlearning should be
+    # those stages) but every backend that can start_unlearning should be
     # able to run the rest of the pipeline too, so these are exposed the
     # same way for Local -- RemoteHttpBackend mirrors this below.
     def run_federated_training(self, experiment_id: str, **kwargs: Any) -> dict[str, Any]:

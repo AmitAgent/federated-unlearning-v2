@@ -1,4 +1,4 @@
-"""The backend-neutral compute API (Phase 14, Dashboard Spec Ch.71).
+"""The backend-neutral compute API (Dashboard Spec Ch.71).
 
 Every compute backend -- College GPU, Google Colab, Local (Mac/CPU/
 CUDA/MPS), and the read-only Demo/Precomputed backend -- implements
@@ -6,7 +6,7 @@ this same seven-method contract. Nothing above this layer (the Express
 routes, the React pages) is allowed to know which backend actually ran
 a given experiment; a frontend switching backends changes nothing
 about how results are displayed, because every backend hands back the
-exact same artifact shapes this project has used since Phase 03.
+exact same artifact shapes this project has used since the partitioning engine was added.
 
 The four concrete backends live in sibling modules:
     local_backend.py        -- in-process, calls core/* directly
@@ -70,16 +70,16 @@ class ComputeBackend(ABC):
     @abstractmethod
     def get_client_distribution(self, experiment_id: str) -> dict[str, Any]:
         """The per-client partition: sample counts and class
-        distribution for every federated client (Phase 03/04)."""
+        distribution for every federated client."""
 
     @abstractmethod
     def get_fl_history(self, experiment_id: str) -> dict[str, Any]:
-        """The round-by-round FedAvg training history (Phase 05)."""
+        """The round-by-round FedAvg training history."""
 
     @abstractmethod
     def start_unlearning(self, experiment_id: str, client_id: int, **kwargs: Any) -> dict[str, Any]:
         """Run Gradient Ascent + Knowledge Distillation against
-        `client_id` (Phase 08+09). Raises NotSupportedError on a
+        `client_id`. Raises NotSupportedError on a
         read-only backend (Demo)."""
 
     @abstractmethod
@@ -88,7 +88,7 @@ class ComputeBackend(ABC):
 
     @abstractmethod
     def get_results(self, experiment_id: str) -> dict[str, Any]:
-        """The Phase 10 evaluation results (before/after metrics)."""
+        """The evaluation results (before/after metrics)."""
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid only
         return f"<{type(self).__name__} kind={self.kind!r}>"

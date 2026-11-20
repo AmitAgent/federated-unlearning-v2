@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useExperimentConfig } from "../state/ExperimentContext.jsx";
 
-// Phase 15 -- the Professor Demo walkthrough strip (Dashboard Spec
+// The Professor Demo walkthrough strip (Dashboard Spec
 // Ch.37). Shows where you are in the 6-step research story with a
 // suggested time for each, plus Previous / Next. The times add up to
 // the spec's ~10 minute demo; they are a speaking guide, not timers.

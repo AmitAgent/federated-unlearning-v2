@@ -1,11 +1,11 @@
-"""Persistence for unlearning status (Phase 08 + Phase 09).
+"""Persistence for unlearning status.
 
 Mirrors core/federated/storage.py: status is written to
 ``experiments/<experiment_id>/unlearning_status.json``, the
 Gradient Ascent stage's resulting weights to
 ``experiments/<experiment_id>/unlearning_ga_model.pt`` -- both
 alongside that experiment's ``partition.json``/``fl_history.json``/
-``global_model.pt``. Knowledge Distillation (Phase 09) loads the GA
+``global_model.pt``. Knowledge Distillation loads the GA
 checkpoint as its starting point, and its own resulting weights --
 the final unlearned model -- are saved to
 ``experiments/<experiment_id>/unlearning_final_model.pt``.
@@ -77,7 +77,7 @@ def save_ga_checkpoint(
     """Persist the Gradient Ascent stage's resulting weights.
 
     Same shape as `core.federated.storage.save_model_checkpoint` so
-    Phase 09 can load either checkpoint the same way.
+    Knowledge Distillation can load either checkpoint the same way.
     """
     import torch
 
@@ -119,10 +119,10 @@ def save_final_checkpoint(
     num_classes: int,
 ) -> Path:
     """Persist the fully unlearned model -- Gradient Ascent followed by
-    Knowledge Distillation (Phase 09's "Unlearned Model" deliverable).
+    Knowledge Distillation (the "Unlearned Model" deliverable).
 
     Same shape as `save_ga_checkpoint`/`save_model_checkpoint` so a
-    loader (e.g. Phase 10's evaluation) can reconstruct the model the
+    loader (e.g. the evaluation engine) can reconstruct the model the
     same way regardless of which stage produced it.
     """
     import torch

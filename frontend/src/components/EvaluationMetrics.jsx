@@ -1,4 +1,4 @@
-// Page 7 — Evaluation metric cards (Dashboard Spec Ch.21-22, Phase 10).
+// Page 7 — Evaluation metric cards (Dashboard Spec Ch.21-22).
 // Four before/after metric cards (global accuracy, forget-client
 // accuracy, retained-client accuracy, MIA success) plus a runtime
 // breakdown card. Values are always the real measured before/after
@@ -6,7 +6,7 @@
 //
 // The dedicated grouped-bar "Before vs After Visualization" (Ch.23)
 // and full-retraining comparison (Ch.24) are a separate, later
-// screen (Phase 11 / RetrainingComparison.jsx) -- this component is
+// screen (RetrainingComparison.jsx) -- this component is
 // just Page 7's four metric cards + runtime.
 
 function pct(value) {

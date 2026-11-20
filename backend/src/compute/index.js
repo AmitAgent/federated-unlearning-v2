@@ -6,8 +6,9 @@ import { CollegeGPUBackend } from "./CollegeGPUBackend.js";
 /**
  * ComputeManager — picks a backend by name (env: COMPUTE_BACKEND).
  * "auto" priority per Ch. 71.16: college-gpu -> colab -> local -> demo.
- * Phase 00: only "demo" is actually usable; the rest are stubs that
- * report unavailable until their real implementations land.
+ * Only "demo" reports available here; the others are stubs. The working
+ * College GPU / Colab / Local / Demo backends are in core/compute and are
+ * reached through /api/compute.
  */
 const BACKENDS = {
   demo: DemoBackend,

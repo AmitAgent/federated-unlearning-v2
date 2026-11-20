@@ -3,7 +3,7 @@ import { validateExperimentIdParam } from "../artifacts.js";
 import { runEngine } from "../runEngine.js";
 import { sendInvalidRequest } from "../errors.js";
 
-// Phase 16 -- model releases and the auto / request-then-force update
+// Model releases and the auto / request-then-force update
 // policy for devices that already installed a model.
 //
 // All the rules live in Python (core/distribution/); these routes only

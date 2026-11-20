@@ -1,4 +1,4 @@
-"""Dataset interface (Dashboard Spec Ch.3-5, Phase 01).
+"""Dataset interface (Dashboard Spec Ch.3-5).
 
 Every dataset (MNIST, CIFAR-10, CIFAR-100, and anything added later)
 implements this interface. Metadata comes from manifest.json so the

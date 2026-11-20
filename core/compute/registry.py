@@ -1,4 +1,4 @@
-"""Compute backend registry + Auto fallback chain (Phase 14).
+"""Compute backend registry + Auto fallback chain.
 
     status = all_statuses()                  # for the status panel
     backend, trace = resolve_auto_backend()  # College GPU -> Colab -> Local -> Demo

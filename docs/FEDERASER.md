@@ -1,6 +1,6 @@
 # FedEraser (additional comparison method)
 
-FedEraser (Wang et al., "FedEraser: Enabling Efficient Client-Level Data Removal
+FedEraser (Liu et al., "FedEraser: Enabling Efficient Client-Level Data Removal
 from Federated Learning Models", IEEE/ACM IWQoS 2021) is added to the Method
 Comparison as a published method that works differently from the GA + KD family:
 it does not start from the final model. It replays the recorded training history

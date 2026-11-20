@@ -1,9 +1,9 @@
-"""CLI entrypoint the Express backend shells out to (Phase 10).
+"""CLI entrypoint the Express backend shells out to.
 
     python -m core.evaluation.cli --experiment-id demo-1
 
 Requires that experiment ``demo-1`` already has a trained checkpoint
-(Phase 05) and a completed unlearning run (Phase 08+09) saved. Computes
+ and a completed unlearning run saved. Computes
 all five Page 7 metrics before/after, persists them, and prints the
 result as JSON on stdout for the API layer.
 """
@@ -18,7 +18,7 @@ from core.evaluation.evaluation_engine import DEFAULT_NON_MEMBER_SAMPLE_SIZE, ev
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Run Phase 10 evaluation: accuracy (global/forget/retained), MIA, and runtime."
+        description="Run the evaluation: accuracy (global/forget/retained), MIA, and runtime."
     )
     parser.add_argument("--experiment-id", required=True)
     parser.add_argument(
@@ -28,7 +28,7 @@ def main(argv: list[str] | None = None) -> int:
         help="Held-out test samples used as the MIA's non-member set",
     )
     parser.add_argument("--device", default="cpu")
-    # Phase 14: optional compute backend selection. Omitted (the
+    # Optional compute backend selection. Omitted (the
     # default) behaves exactly as before this flag existed.
     parser.add_argument(
         "--backend",

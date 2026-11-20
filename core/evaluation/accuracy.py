@@ -1,4 +1,4 @@
-"""Accuracy evaluation (Phase 10).
+"""Accuracy evaluation.
 
 Three of the five Evaluation-screen metrics (Ch.21-22, Page 7): global
 accuracy, forget-client accuracy, and retained-client accuracy. Used by
@@ -8,10 +8,10 @@ final unlearned checkpoint ("after").
 
 Deliberately independent of `core.unlearning`'s own per-client accuracy
 tracking (Knowledge Distillation logs retained accuracy too, as part of
-Phase 09's training loop) -- the Dashboard Spec keeps the Evaluation
+its training loop) -- the Dashboard Spec keeps the Evaluation
 Engine a separate backend service (Ch.35) from the Unlearning Engine,
-so Phase 10's numbers are re-measured here rather than silently
-depending on exactly how Phase 09 chose to log its own training-time
+so these numbers are re-measured here rather than silently
+depending on exactly how the unlearning engine chose to log its own training-time
 metrics.
 """
 from __future__ import annotations

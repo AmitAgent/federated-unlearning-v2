@@ -19,7 +19,7 @@ export default function DataDistribution() {
 
   const canPartition = Boolean(config.dataset);
 
-  // Phase 15: a stored experiment's partition is loaded and shown
+  // A stored experiment's partition is loaded and shown
   // (labelled Precomputed) instead of the page staying empty until
   // "Run Partitioning" is pressed. That empty page meant a loaded or
   // demo experiment could not be replayed from the first screen.

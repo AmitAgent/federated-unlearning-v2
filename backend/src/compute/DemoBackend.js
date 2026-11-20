@@ -5,8 +5,7 @@ import { ComputeBackend } from "./ComputeBackend.js";
  * Will eventually load precomputed experiment artifacts from
  * experiments/ instead of running anything live.
  *
- * TODO (later phase): read JSON artifacts under experiments/<name>/
- * and return them from these methods instead of throwing.
+ * Stub: the working implementation is in core/compute (Python).
  */
 export class DemoBackend extends ComputeBackend {
   async getStatus() {

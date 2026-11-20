@@ -1,4 +1,4 @@
-"""Remote compute server (Phase 14b) -- run this on the College GPU box or in Colab.
+"""Remote compute server -- run this on the College GPU box or in Colab.
 
     export COMPUTE_API_KEY=<long random string>
     python -m core.compute.server --host 127.0.0.1 --port 8000

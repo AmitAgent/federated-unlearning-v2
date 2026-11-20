@@ -27,6 +27,55 @@ Dataset -> Partition -> Federated training -> Global model -> Choose client to f
 - **Everything is saved** in `experiments/<id>/`, so any finished experiment can be
   reopened, checked and replayed without recomputing it.
 
+## Dashboard tour
+
+The screenshots come from a stored `real-mnist` experiment: MNIST, 10 clients, Non-IID, 20 FedAvg rounds, forgetting Client 9. The Method Comparison screenshot is from a different stored experiment (target client 7).
+
+### 1. Experiment Setup
+Choose a dataset and the configuration, then train live or load a stored experiment.
+
+<img src="docs/images/01-experiment-setup.png" alt="Experiment Setup page" width="640">
+
+### 2. Data Distribution
+Samples and classes per client, client cards with dominant classes, and a class heatmap.
+
+<img src="docs/images/02-data-distribution.png" alt="Data Distribution page" width="640">
+
+### 3. Federated Learning
+The FedAvg loop, round-by-round client updates, and global accuracy and loss curves (90.3% accuracy after 20 rounds here).
+
+<img src="docs/images/03-federated-learning.png" alt="Federated Learning page" width="640">
+
+### 4. Client Selection
+Review the trained global model, then choose which client's data should be forgotten.
+
+<img src="docs/images/04-client-selection.png" alt="Client Selection page" width="720">
+
+### 5. Unlearning
+Gradient Ascent raises the loss on the target client's data; Knowledge Distillation then repairs the other clients. The page ends with a before and after accuracy bar for every client.
+
+<img src="docs/images/05-unlearning.png" alt="Unlearning page" width="480">
+
+### 6. Evaluation
+Global, forget-client and retained-client accuracy, MIA success and runtime, each before and after unlearning.
+
+<img src="docs/images/06-evaluation.png" alt="Evaluation page" width="720">
+
+### 7. Retraining Comparison
+Original vs unlearned vs a model retrained from scratch without the target client, plus the runtime difference (3.3 min vs 12.1 min in this run).
+
+<img src="docs/images/07-retraining-comparison.png" alt="Retraining Comparison page" width="640">
+
+### 8. Method Comparison
+Every unlearning method scored against the retrained reference on the same trained model.
+
+<img src="docs/images/08-method-comparison.png" alt="Method Comparison page" width="720">
+
+### 9. Model Updates
+Publish the unlearned model as a new version and choose how devices must switch. Devices and the clock are simulated.
+
+<img src="docs/images/09-model-updates.png" alt="Model Updates page" width="720">
+
 ## Unlearning methods
 
 | Method | Kind |
@@ -37,7 +86,7 @@ Dataset -> Partition -> Federated training -> Global model -> Choose client to f
 | GradDiff (untuned) | Baseline |
 | NegGrad+ (Kurmanji et al., 2023) | Published baseline |
 | Retain-only fine-tune | Baseline |
-| FedEraser (Wang et al., 2021) | Published method that replays recorded training rounds ([details](./docs/FEDERASER.md)) |
+| FedEraser (Liu et al., 2021) | Published method that replays recorded training rounds ([details](./docs/FEDERASER.md)) |
 | Full retraining without the client | The reference every gap is measured against |
 
 Measured results from one setup are in [`docs/results.md`](./docs/results.md).
@@ -148,7 +197,7 @@ core/         Python engine: datasets, partitioning, federated, unlearning, eval
 tests/        pytest suite
 docs/         Specification, architecture, results, guides
 colab/        Notebook for running the compute server on Google Colab
-dashboard/    Static page
+dashboard/    Early standalone prototype with a simulated engine (numbers are modeled, not trained)
 experiments/  Generated experiment files (contents are not committed)
 ```
 
@@ -184,11 +233,3 @@ Where each feature lives in the code: [`docs/CODE_MAP.md`](./docs/CODE_MAP.md).
 - No formal or certified unlearning guarantee is claimed. Retraining without the
   client is a reference, not a proof.
 - Model-update devices are simulated.
-
-## How the project was built
-
-It was built in 17 stages (00 to 16), from project setup through the dataset layer,
-partitioning, federated training, the unlearning engine, evaluation, retraining
-comparison, the dashboard, compute backends, hardening and model updates. The
-per-stage notes were removed when the work was finished and remain in git history;
-[`docs/CODE_MAP.md`](./docs/CODE_MAP.md) describes the result.

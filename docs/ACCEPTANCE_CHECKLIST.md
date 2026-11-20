@@ -130,5 +130,5 @@ them on the projector you will actually use.
 | CIFAR-100 | | | | |
 
 A warning from the checker (for example "unlearning hyperparameters not
-recorded") is not a failure. It means the run was made before Phase 15 saved
+recorded") is not a failure. It means the run was made before unlearning settings were saved
 those settings. Re-run unlearning to record them.

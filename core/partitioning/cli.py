@@ -1,10 +1,10 @@
-"""CLI entrypoint the Express backend shells out to (Phase 03).
+"""CLI entrypoint the Express backend shells out to.
 
     python -m core.partitioning.cli --dataset cifar10 --num-clients 10 \\
         --strategy non_iid --seed 42 --experiment-id demo-1
 
 Computes the partition, persists the full partition (with per-client
-sample indices, for later phases like federated training to consume)
+sample indices, for later stages like federated training to consume)
 to experiments/<experiment-id>/partition.json, and prints the
 lightweight summary (no indices) as JSON on stdout for the API layer.
 """

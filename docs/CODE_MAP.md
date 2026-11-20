@@ -1,13 +1,6 @@
 # Code map
 
-Where each part of the project lives. The project was built in 17 stages
-(numbered 00 to 16, each with its own folder and notes). Those per-stage folders
-were removed once the work was finished; this page replaces them. The old notes
-are still in git history (for example
-`git show 8fc7775:phase-05-federated-learning-engine/README.md`).
-
-Many source comments still say "Phase 11", "Phase 15" and so on. They refer to
-those build stages and are kept as a record of when each piece was added.
+Where each part of the project lives.
 
 ## How a request flows
 
@@ -35,7 +28,7 @@ read-only demo backend) and reads results back from `experiments/<id>/`.
 | | `unlearning_engine.py`, `storage.py`, `cli.py` | `start_unlearning` / `get_unlearning_status`, chains GA then KD |
 | Calibration and adaptation | `calibration.py`, `heterogeneity.py`, `adaptive.py` | Opt-in calibrated stopping and the heterogeneity-adaptive controller (see `docs/RESEARCH_EXTENSION.md`) |
 | Other methods | `baselines.py` | GradDiff, NegGrad+ (Kurmanji et al., 2023), retain-only fine-tune |
-| | `federaser.py`, `federaser_cli.py` | FedEraser (Wang et al., 2021): replays recorded training rounds without the target client (see `docs/FEDERASER.md`) |
+| | `federaser.py`, `federaser_cli.py` | FedEraser (Liu et al., 2021): replays recorded training rounds without the target client (see `docs/FEDERASER.md`) |
 | Method comparison | `compare_modes.py` | Runs the methods above against the retrained reference and writes `mode_comparison.json` |
 | Evaluation | `core/evaluation/accuracy.py`, `mia.py`, `evaluation_engine.py` | Global, forget-client and retained-client accuracy, a loss-threshold membership inference attack, runtime |
 | Retraining baseline | `retraining.py`, `retraining_cli.py`, `comparison.py` | Full retraining without the target client under the original protocol; original vs unlearned vs retrained comparison |

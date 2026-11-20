@@ -1,4 +1,4 @@
-"""CLI entrypoint the Express backend shells out to (Phase 11).
+"""CLI entrypoint the Express backend shells out to.
 
     # Run the (expensive) full-retraining baseline, then compare:
     python -m core.evaluation.retraining_cli --experiment-id demo-1
@@ -20,7 +20,7 @@ import sys
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Run the Phase 11 full-retraining baseline and/or compare it with unlearning."
+        description="Run the full-retraining baseline and/or compare it with unlearning."
     )
     parser.add_argument("--experiment-id", required=True)
     parser.add_argument("--device", default="cpu")

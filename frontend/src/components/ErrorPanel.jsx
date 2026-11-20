@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { toApiError } from "../lib/api.js";
 
-// Phase 15 -- the one error display (Dashboard Spec Ch.43).
+// The one error display (Dashboard Spec Ch.43).
 //
 // It answers three questions in plain words: what failed, which stage
 // it failed in, and what can be done next. The technical text is kept

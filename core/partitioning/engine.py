@@ -1,4 +1,4 @@
-"""Data partitioning engine (Dashboard Spec Ch.6, Phase 03).
+"""Data partitioning engine (Dashboard Spec Ch.6).
 
 Splits a dataset's training samples across N simulated federated
 clients, either IID (uniform random) or Non-IID (label-skewed via a
@@ -7,7 +7,7 @@ reproducibility.
 
 Real per-sample labels aren't loaded here -- that needs torch/
 torchvision plus a download, the same heavy-dependency tradeoff
-Phase 01 avoided for get_metadata(). Instead each dataset's labels
+the dataset layer avoided for get_metadata(). Instead each dataset's labels
 are treated as a deterministic, perfectly balanced round-robin over
 its class count from manifest.json, which is a close approximation
 for MNIST/CIFAR-10/CIFAR-100 (all near-perfectly balanced). Only the

@@ -15,7 +15,7 @@ router.param("experimentId", validateExperimentIdParam);
 // full-retraining-from-scratch baseline (excludes the unlearning
 // target client, reuses the original run's protocol), persist to
 // experiments/<id>/{retrained_model.pt,retraining_results.json}, and
-// return { retraining, comparison } (Phase 11, Dashboard Spec Ch.24).
+// return { retraining, comparison } (Dashboard Spec Ch.24).
 // This is the expensive call -- typically run once, offline/on demand
 // (Ch.37) -- and requires /api/unlearning + /api/evaluation to have
 // already completed for this experiment_id.

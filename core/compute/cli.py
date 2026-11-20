@@ -1,4 +1,4 @@
-"""CLI entrypoint the Express backend shells out to (Phase 14).
+"""CLI entrypoint the Express backend shells out to.
 
     python -m core.compute.cli status
 

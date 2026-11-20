@@ -1,4 +1,4 @@
-"""Orchestrates Phase 10 evaluation.
+"""Orchestrates the evaluation.
 
 All five Page 7 metrics (Ch.21-22) -- global accuracy, forget-client
 accuracy, retained-client accuracy, MIA, and runtime -- computed once
@@ -8,10 +8,9 @@ final unlearned checkpoint ("after"). Exposes the single conceptual
 ``evaluate_experiment(experiment_id)``, matching the "Evaluation
 Engine" box in the Ch.35 backend service diagram.
 
-Requires that this experiment has already been through Phase 05
-(trained, checkpoint saved) and Phase 08+09 (``start_unlearning``
-complete, final checkpoint + status saved) -- Phase 10 Depends On
-Phase 09.
+Requires that this experiment has already been through federated
+training (trained, checkpoint saved) and unlearning (``start_unlearning``
+complete, final checkpoint + status saved); evaluation depends on both.
 """
 from __future__ import annotations
 
@@ -51,7 +50,7 @@ def evaluate_model_state(
     """The four per-model Page 7 metrics for one set of weights.
 
     Shared by `evaluate_experiment` (original + unlearned models) and
-    Phase 11's retraining baseline (retrained model), so all three
+    the retraining baseline (retrained model), so all three
     models are scored by literally the same code against the same
     target-client indices, retained clients, and MIA non-member set.
     """
@@ -151,7 +150,7 @@ def evaluate_experiment(
 
     ga_summary = status.get("gradient_ascent") or {}
     kd_summary = status.get("knowledge_distillation") or {}
-    # Phase 15 (Spec Ch.44): which code produced these numbers.
+    # Spec Ch.44: which code produced these numbers.
     results["software"] = software_info()
     results["runtime"] = {
         "gradient_ascent_seconds": ga_summary.get("duration_seconds"),

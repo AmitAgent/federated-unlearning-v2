@@ -1,6 +1,6 @@
 import { Component } from "react";
 
-// Phase 15 -- last line of defence. If any page throws while
+// Last line of defence. If any page throws while
 // rendering (for example a stored result with an unexpected shape),
 // React would otherwise unmount the whole app and leave a white
 // screen in the middle of a presentation. This shows a calm message

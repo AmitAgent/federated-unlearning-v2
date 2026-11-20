@@ -1,6 +1,6 @@
 // Shown after a measured run: which compute backend actually ran it,
 // and -- crucially -- whether Auto mode had to fall back to get there.
-// Phase 14: "failure detection + fallback messaging (never silent)".
+// Spec: "failure detection + fallback messaging (never silent)".
 // `trace` is the backend_trace the Python CLI returns: every backend
 // Auto tried, in order, up to and including the one that served the run.
 
